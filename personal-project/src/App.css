@@ -4,15 +4,29 @@
   box-sizing: border-box;
 }
 
+html {
+  height: 100%;
+}
+
 body {
   font-family: 'Arial Narrow';
   text-align: center;
+  /* background-image: url('./img/Background_Earth.jpg'); */
+  /* background-color: #241654; */
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center;
+  background-size: cover;
+  height: 100%;
 }
 
-main {
-  background-image: url('./img/Background_Earth.jpg');
+#root {
+  height: 100%;
 }
 
+.all {
+  height: 100%;
+}
 /*==============================
 =============Header=============
 ==============================*/
@@ -54,7 +68,10 @@ header {
 ==============Main==============
 ==============================*/
 main {
+  /* height: calc(100% - 165px); */
+  height: 100%;
   margin-top: 110px;
+  /* margin-bottom: 55px; */
   max-width: 1024px;
   z-index: 5;
 }
@@ -81,6 +98,12 @@ main {
 .searchAllTop {
   border: 2px black solid;
   border-radius: 10px;
+}
+
+.noSearchConditions {
+  font-size: 30px;
+  font-weight: bold;
+  line-height: 100px;
 }
 
 /*=====setGroup*/

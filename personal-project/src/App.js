@@ -52,6 +52,7 @@ class App extends React.Component {
       newSearchType: 'Headline',
       newSearchValue: '',
       newSearchPlaceHolder: 'Please Input Your Keyword!',
+      articlesAcquired: [],
       searchResults: [],
     };
   }
@@ -108,6 +109,7 @@ class App extends React.Component {
     } else {
       let promiseElement = [];
       let searchResult = [];
+      let aquiredResult = [];
       let getData = (sent) => {
         return firestore.collection(sent).get();
       };
@@ -121,14 +123,19 @@ class App extends React.Component {
         Response.forEach((response) => {
           response.forEach((res) => {
             searchResult.push(res.data());
+            aquiredResult.push(res.data());
           });
         });
+        // this.setState({ articlesAcquired: searchResult });
+        this.setState({ articlesAcquired: aquiredResult });
         this.runConditionFiltering(searchResult);
       });
     }
   }
 
   runConditionFiltering(searchresult) {
+    console.log(searchresult);
+    console.log(this.state);
     let finalResult = [];
 
     if (this.state.setStatus === true) {
@@ -275,9 +282,9 @@ class App extends React.Component {
   }
 
   checkConditionFiltering() {
-    console.log('checkConditionFiltering');
-    console.log(this.state.searchResults);
-    this.runConditionFiltering(this.state.searchResults);
+    let aquiredResult = JSON.parse(JSON.stringify(this.state.articlesAcquired));
+    console.log(aquiredResult);
+    this.runConditionFiltering(aquiredResult);
   }
 
   /*Edit Search Condiiton*/
@@ -449,8 +456,6 @@ class App extends React.Component {
 
     //Search Result Component
     for (let p = 0; p < this.state.searchResults.length; p += 1) {
-      console.log(this.state.searchResults[p].Source);
-      console.log('./img/' + this.state.searchResults[p].Source + '.png');
       let searchResultTemplate = (
         <div
           className='searchResultComponent'
@@ -501,168 +506,179 @@ class App extends React.Component {
     }
 
     //Search Condition Component
-    for (let i = 0; i < this.state.searchConditions.length; i += 1) {
-      //With Or Without Component
-      withOrWithoutComponent = [];
-      searchResultAmountComponent = [];
-
-      if (
-        this.state.searchConditions[i].searchType !== 'Start Date' &&
-        this.state.searchConditions[i].searchType !== 'End Date'
-      ) {
-        let withElement = '';
-        let withoutElement = '';
-        if (this.state.searchConditions[i].withOrWithout === true) {
-          withElement = 'withElement';
-          withoutElement = '';
-        } else if (this.state.searchConditions[i].withOrWithout === false) {
-          withElement = '';
-          withoutElement = 'withoutElement';
-        }
-
-        let withOrWithoutTemplate = (
-          <div
-            className='withOrWithoutComponent'
-            id={'withOrWithoutComponent' + i} //22
-            key={'withOrWithoutComponent' + i}
-            onClick={this.withOrWithoutYou}
-          >
-            <div className={'withOrWithoutElement ' + withElement}>With</div>
-            <div className={'withOrWithoutElement ' + withoutElement}>
-              Without
-            </div>
-          </div>
-        );
-        withOrWithoutComponent.push(withOrWithoutTemplate);
-      }
-
-      //Search Result Amount Component
-      let searchResultAmountTemplate = (
-        <div
-          className={'searchResultAmountComponent'}
-          id={'searchResultAmountComponent' + i} //27
-          key={'searchResultAmountComponent' + i}
-        >
-          {this.state.searchConditions[i].resultAmount}
+    if (this.state.searchConditions.length === 0) {
+      searchConditionComponent = (
+        <div className='noSearchConditions'>
+          No Search Conditions Inputted Yet!
         </div>
       );
-      searchResultAmountComponent.push(searchResultAmountTemplate);
+    } else if (this.state.searchConditions.length) {
+      for (let i = 0; i < this.state.searchConditions.length; i += 1) {
+        //With Or Without Component
+        withOrWithoutComponent = [];
+        searchResultAmountComponent = [];
 
-      //Overall Search Conditions
-      if (this.state.searchConditions[i].editing === false) {
-        let searchConditionTemplate = (
+        if (
+          this.state.searchConditions[i].searchType !== 'Start Date' &&
+          this.state.searchConditions[i].searchType !== 'End Date'
+        ) {
+          let withElement = '';
+          let withoutElement = '';
+          if (this.state.searchConditions[i].withOrWithout === true) {
+            withElement = 'withElement';
+            withoutElement = '';
+          } else if (this.state.searchConditions[i].withOrWithout === false) {
+            withElement = '';
+            withoutElement = 'withoutElement';
+          }
+
+          let withOrWithoutTemplate = (
+            <div
+              className='withOrWithoutComponent'
+              id={'withOrWithoutComponent' + i} //22
+              key={'withOrWithoutComponent' + i}
+              onClick={this.withOrWithoutYou}
+            >
+              <div className={'withOrWithoutElement ' + withElement}>With</div>
+              <div className={'withOrWithoutElement ' + withoutElement}>
+                Without
+              </div>
+            </div>
+          );
+          withOrWithoutComponent.push(withOrWithoutTemplate);
+        }
+
+        //Search Result Amount Component
+        let searchResultAmountTemplate = (
           <div
-            className='searchConditionComponent'
-            key={'searchConditionComponent' + i}
+            className={'searchResultAmountComponent'}
+            id={'searchResultAmountComponent' + i} //27
+            key={'searchResultAmountComponent' + i}
           >
-            <div
-              className={
-                'searchConditionLeftColumn ' +
-                searchClassStatus.searchConditionLeftColumn
-              }
-            >
-              {withOrWithoutComponent}
-            </div>
-            <div className='searchConditionMidColumn'>
-              <div className='searchConditionGroupFirstLine'>
-                <div className='search-left-top searchConditionValue'>
-                  {this.state.searchConditions[i].searchValue}
-                </div>
-                <div className='search-right-top searchConditionType'>
-                  {this.state.searchConditions[i].searchType}
-                </div>
-              </div>
-              <div className='searchConditionGroupSecondLine'>
-                <button
-                  className='search-left-bottom searchConditionEdit'
-                  id={'searchConditionEdit' + i} //19
-                  onClick={this.editSearchCondition}
-                >
-                  Edit
-                </button>
-                <button
-                  className='search-right-bottom searchConditionDelete'
-                  id={'searchConditionDelete' + i} //21
-                  onClick={this.deleteSearchCondition}
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-            <div
-              className={
-                'searchConditionRightColumn ' +
-                searchClassStatus.searchConditionRightColumn
-              }
-            >
-              {searchResultAmountComponent}
-            </div>
+            {this.state.searchConditions[i].resultAmount}
           </div>
         );
-        searchConditionComponent.push(searchConditionTemplate);
-      } else if (this.state.searchConditions[i].editing === true) {
-        console.log(this.state.searchConditions[i]);
-        let searchConditionEditingTemplate = (
-          <div
-            className='searchConditionComponent'
-            key={'searchConditionComponent' + i}
-          >
+        searchResultAmountComponent.push(searchResultAmountTemplate);
+
+        //Overall Search Conditions
+        if (this.state.searchConditions[i].editing === false) {
+          let searchConditionTemplate = (
             <div
-              className={
-                'searchConditionLeftColumn ' +
-                searchClassStatus.searchConditionLeftColumn
-              }
+              className='searchConditionComponent'
+              key={'searchConditionComponent' + i}
             >
-              {withOrWithoutComponent}
-            </div>
-            <div className='searchConditionMidColumn'>
-              <div className='searchConditionGroupFirstLine'>
-                <input
-                  className='search-left-top searchInput'
-                  id={'inputNewSearchKeyword' + i} //21
-                  onChange={this.inputNewSearchKeyword}
-                  value={this.state.searchConditions[i].searchValueEditing}
-                ></input>
-                <select
-                  className='search-right-top searchSelect'
-                  id={'changeNewSearchOption' + i} //21
-                  onChange={this.changeNewSearchOption}
-                  value={this.state.searchConditions[i].searchTypeEditing}
-                >
-                  <option>Headline</option>
-                  <option>Subheadline</option>
-                  <option>Author</option>
-                  <option>Context</option>
-                  <option>Start Date</option>
-                  <option>End Date</option>
-                </select>
+              <div
+                className={
+                  'searchConditionLeftColumn ' +
+                  searchClassStatus.searchConditionLeftColumn
+                }
+              >
+                {withOrWithoutComponent}
               </div>
-              <div className='searchConditionGroupSecondLine'>
-                <button
-                  className='search-left-bottom searchConditionSave'
-                  id={'searchConditionSave' + i} //19
-                  onClick={this.saveSearchCondition}
-                >
-                  Save
-                </button>
-                <button
-                  className='search-right-bottom searchConditionCancelEditing'
-                  id={'searchConditionCancelEditing' + i} //28
-                  onClick={this.cancelEditingCondition}
-                >
-                  Cancel
-                </button>
+              <div className='searchConditionMidColumn'>
+                <div className='searchConditionGroupFirstLine'>
+                  <div className='search-left-top searchConditionValue'>
+                    {this.state.searchConditions[i].searchValue}
+                  </div>
+                  <div className='search-right-top searchConditionType'>
+                    {this.state.searchConditions[i].searchType}
+                  </div>
+                </div>
+                <div className='searchConditionGroupSecondLine'>
+                  <button
+                    className='search-left-bottom searchConditionEdit'
+                    id={'searchConditionEdit' + i} //19
+                    onClick={this.editSearchCondition}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className='search-right-bottom searchConditionDelete'
+                    id={'searchConditionDelete' + i} //21
+                    onClick={this.deleteSearchCondition}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+              <div
+                className={
+                  'searchConditionRightColumn ' +
+                  searchClassStatus.searchConditionRightColumn
+                }
+              >
+                {searchResultAmountComponent}
               </div>
             </div>
+          );
+          searchConditionComponent.push(searchConditionTemplate);
+        } else if (this.state.searchConditions[i].editing === true) {
+          console.log(this.state.searchConditions[i]);
+          let searchConditionEditingTemplate = (
             <div
-              className={
-                'searchConditionRightColumn ' +
-                searchClassStatus.searchConditionRightColumn
-              }
-            ></div>
-          </div>
-        );
-        searchConditionComponent.push(searchConditionEditingTemplate);
+              className='searchConditionComponent'
+              key={'searchConditionComponent' + i}
+            >
+              <div
+                className={
+                  'searchConditionLeftColumn ' +
+                  searchClassStatus.searchConditionLeftColumn
+                }
+              >
+                {withOrWithoutComponent}
+              </div>
+              <div className='searchConditionMidColumn'>
+                <div className='searchConditionGroupFirstLine'>
+                  <input
+                    className='search-left-top searchInput'
+                    id={'inputNewSearchKeyword' + i} //21
+                    onChange={this.inputNewSearchKeyword}
+                    value={this.state.searchConditions[i].searchValueEditing}
+                  ></input>
+                  <select
+                    className='search-right-top searchSelect'
+                    id={'changeNewSearchOption' + i} //21
+                    onChange={this.changeNewSearchOption}
+                    value={this.state.searchConditions[i].searchTypeEditing}
+                  >
+                    <option>Headline</option>
+                    <option>Subheadline</option>
+                    <option>Author</option>
+                    <option>Context</option>
+                    <option>Start Date</option>
+                    <option>End Date</option>
+                  </select>
+                </div>
+                <div className='searchConditionGroupSecondLine'>
+                  <button
+                    className='search-left-bottom searchConditionSave'
+                    id={'searchConditionSave' + i} //19
+                    onClick={(e) => {
+                      this.saveSearchCondition(e);
+                      this.checkConditionFiltering();
+                    }}
+                  >
+                    Save
+                  </button>
+                  <button
+                    className='search-right-bottom searchConditionCancelEditing'
+                    id={'searchConditionCancelEditing' + i} //28
+                    onClick={this.cancelEditingCondition}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+              <div
+                className={
+                  'searchConditionRightColumn ' +
+                  searchClassStatus.searchConditionRightColumn
+                }
+              ></div>
+            </div>
+          );
+          searchConditionComponent.push(searchConditionEditingTemplate);
+        }
       }
     }
 
@@ -688,7 +704,7 @@ class App extends React.Component {
             <div className='headerLink'>Contact Us</div>
           </div>
         </header>
-        <main style={{ backgroundImage: `url(${background})` }}>
+        <main>
           <div className={'searchAll ' + searchClassStatus.searchAll}>
             <div className='searchAllTop'>
               <div className='setGroup'>{setComponent}</div>
