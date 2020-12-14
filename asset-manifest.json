@@ -1,24 +1,27 @@
 {
   "files": {
-    "main.css": "/Personal-Project/static/css/main.63280fdd.chunk.css",
-    "main.js": "/Personal-Project/static/js/main.eaea8c9a.chunk.js",
-    "main.js.map": "/Personal-Project/static/js/main.eaea8c9a.chunk.js.map",
+    "main.css": "/Personal-Project/static/css/main.5d2710f5.chunk.css",
+    "main.js": "/Personal-Project/static/js/main.6610025e.chunk.js",
+    "main.js.map": "/Personal-Project/static/js/main.6610025e.chunk.js.map",
     "runtime-main.js": "/Personal-Project/static/js/runtime-main.50e9af99.js",
     "runtime-main.js.map": "/Personal-Project/static/js/runtime-main.50e9af99.js.map",
-    "static/js/2.b8bed768.chunk.js": "/Personal-Project/static/js/2.b8bed768.chunk.js",
-    "static/js/2.b8bed768.chunk.js.map": "/Personal-Project/static/js/2.b8bed768.chunk.js.map",
+    "static/js/2.1c7bd275.chunk.js": "/Personal-Project/static/js/2.1c7bd275.chunk.js",
+    "static/js/2.1c7bd275.chunk.js.map": "/Personal-Project/static/js/2.1c7bd275.chunk.js.map",
     "index.html": "/Personal-Project/index.html",
-    "static/css/main.63280fdd.chunk.css.map": "/Personal-Project/static/css/main.63280fdd.chunk.css.map",
-    "static/js/2.b8bed768.chunk.js.LICENSE.txt": "/Personal-Project/static/js/2.b8bed768.chunk.js.LICENSE.txt",
-    "static/media/Logo.png": "/Personal-Project/static/media/Logo.384869ab.png",
+    "static/css/main.5d2710f5.chunk.css.map": "/Personal-Project/static/css/main.5d2710f5.chunk.css.map",
+    "static/js/2.1c7bd275.chunk.js.LICENSE.txt": "/Personal-Project/static/js/2.1c7bd275.chunk.js.LICENSE.txt",
+    "static/media/App.css": "/Personal-Project/static/media/Background_Earth.159c0fcb.jpg",
+    "static/media/Block.png": "/Personal-Project/static/media/Block.f99d3632.png",
+    "static/media/Logo.png": "/Personal-Project/static/media/Logo.6b99208e.png",
+    "static/media/Logo2.png": "/Personal-Project/static/media/Logo2.384869ab.png",
     "static/media/The Economist.png": "/Personal-Project/static/media/The Economist.330163aa.png",
     "static/media/The Economist_original.png": "/Personal-Project/static/media/The Economist_original.ab6ecc51.png",
     "static/media/The New York Times.png": "/Personal-Project/static/media/The New York Times.afb191f3.png"
   },
   "entrypoints": [
     "static/js/runtime-main.50e9af99.js",
-    "static/js/2.b8bed768.chunk.js",
-    "static/css/main.63280fdd.chunk.css",
-    "static/js/main.eaea8c9a.chunk.js"
+    "static/js/2.1c7bd275.chunk.js",
+    "static/css/main.5d2710f5.chunk.css",
+    "static/js/main.6610025e.chunk.js"
   ]
 }
