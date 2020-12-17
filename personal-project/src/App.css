@@ -135,19 +135,21 @@ main {
   height: 100%;
   transition: all 2s;
   vertical-align: top;
-  /* width: calc(50%+300px); */
+  width: calc(50% + 300px);
+  padding-left: calc(50% - 300px);
   z-index: 6;
 }
 
 .mainLeftAfter {
   width: 45%;
+  padding-left: calc(22.5% - 300px);
 }
 
 .mainRight {
   display: inline-block;
   height: 100%;
   transition: all 2s;
-  width: calc(50%-300px);
+  width: calc(50% - 300px);
   vertical-align: top;
   z-index: 6;
 }
@@ -393,7 +395,6 @@ main {
   cursor: pointer;
   height: 21px;
   width: 180px;
-  margin-right: 5px;
 
   background-color: #007cc7;
   color: white;
@@ -401,16 +402,35 @@ main {
   border-style: none;
 }
 
+@keyframes searchSubmitButton {
+  from {
+    opacity: 0;
+    width: 0;
+  }
+  to {
+    opacity: 1;
+    width: 105px;
+  }
+}
+
 .searchSubmitButton {
   cursor: pointer;
   height: 21px;
-  width: 105px;
-
+  transition: all 0.75s;
+  margin-left: 5px;
+  /* overflow: hidden; */
   background-color: #03456e;
   color: white;
   border-radius: 5px;
   border-style: none;
+  animation-name: searchSubmitButton;
+  animation-duration: 2s;
 }
+
+/* .searchSubmitButtonAfter {
+  width: 105px;
+  opacity: 1;
+} */
 
 .searchGroupThirdLine {
   margin-top: 15px;
@@ -484,24 +504,113 @@ input[type='checkbox'] {
 
 .resultOrder {
   display: flex;
-  flex: 4;
+  flex: 6;
 }
 
 .resultOrderTitle {
+  font-size: 18px;
   font-weight: bold;
 }
 
 .resultOrderOption {
-  margin-left: 15px;
+  cursor: pointer;
+  display: flex;
+  margin-left: 10px;
+  /* text-decoration: underline; */
+}
+
+.currentResultOrderOption {
+  /* font-weight: bold; */
+  cursor: inherit;
   text-decoration: underline;
+}
+
+/* #orderSearchCondition {
+  text-decoration: underline;
+} */
+
+#orderDate {
+  cursor: pointer;
+}
+
+.orderingArrow {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.arrowUp {
+  border-bottom: 8px solid #767676;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  flex: 1;
+  height: 40%;
+  margin-bottom: 15%;
+  width: 0;
+}
+
+.currentArrowUp {
+  border-bottom: 8px solid #000000;
+}
+
+.arrowDown {
+  border-top: 8px solid #767676;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  flex: 1;
+  height: 40%;
+  margin-top: 15%;
+  width: 0;
+}
+
+.currentArrowDown {
+  border-top: 8px solid #000000;
 }
 
 .resultPaging {
   display: flex;
-  flex: 8;
+  flex: 6;
 }
 
 .resultPagingOption {
+  flex: 1;
+}
+
+.pagingArrows {
+  cursor: pointer;
+  text-align: center;
+}
+
+.pagingElements {
+  display: flex;
+  flex: 5;
+  justify-content: center;
+}
+
+.pagingElement {
+  text-align: center;
+  cursor: pointer;
+  flex: 1;
+  max-width: 33.64px;
+}
+
+.currentPagingElement {
+  cursor: inherit;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.pagingAmount {
+  display: flex;
+  flex: 1;
+  padding-right: 30px;
+}
+
+.pagingAmountTitle {
+  flex: 3;
+}
+
+.pagingAmountSelect {
   flex: 1;
 }
 
@@ -511,6 +620,7 @@ input[type='checkbox'] {
 }
 
 .resultDisplayComponent {
+  cursor: pointer;
   flex: 1;
   height: 30px;
   width: 30px;
@@ -527,6 +637,15 @@ input[type='checkbox'] {
 }
 
 /*=====searchResultComponent*/
+@keyframes searchResultComponent {
+  from {
+    width: 0;
+  }
+  to {
+    width: 800px;
+  }
+}
+
 .searchResultComponent {
   background-color: white;
   display: flex;
@@ -539,13 +658,15 @@ input[type='checkbox'] {
   margin: 30px 50px 0px;
   position: relative;
   transform: translateX(-50%);
-  width: 0;
-  transition: all 2s;
+  animation-name: searchResultComponent;
+  animation-duration: 2s;
+  /* transition: all 2s; */
+  overflow: hidden;
 }
 
-.searchResultComponentAfter {
+/* .searchResultComponentAfter {
   width: 800px;
-}
+} */
 
 .searchResultImg {
   float: left;

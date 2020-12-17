@@ -11,6 +11,8 @@ import { Droppable } from 'react-beautiful-dnd';
 import { Draggable } from 'react-beautiful-dnd';
 
 let searchClassStatus = {};
+let searchClassStatus2 = {};
+
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -35,6 +37,13 @@ class App extends React.Component {
     this.cancelEditingCondition = this.cancelEditingCondition.bind(this);
     //Check Media Brand
     this.checkMediaBrand = this.checkMediaBrand.bind(this);
+    //Adjust Result Component
+    this.changeResultOrder = this.changeResultOrder.bind(this);
+    this.reOrdering = this.reOrdering.bind(this);
+    this.changeCurrentPaging = this.changeCurrentPaging.bind(this);
+    this.clickPagingArrow = this.clickPagingArrow.bind(this);
+    this.changePagingAmount = this.changePagingAmount.bind(this);
+    this.changeDetailShowing = this.changeDetailShowing.bind(this);
     //State
     this.state = {
       setStatus: true,
@@ -60,7 +69,14 @@ class App extends React.Component {
       articlesAcquired: [],
       // mediaAcquired: [],
       searchResults: [],
+      currentPaging: 1,
+      fullPaging: 1,
+      pagingAmount: 10,
+      detailShowing: true,
       searchClicked: false,
+      resultOrder: 'orderSearchCondition',
+      startDate: 20200101,
+      endDate: 20201231,
     };
   }
 
@@ -330,12 +346,28 @@ class App extends React.Component {
         searchConditions[n].resultAmount = finalResult.length;
       }
     }
+
+    let pagingIndex;
+    if (finalResult) {
+      pagingIndex = Math.ceil(finalResult.length / this.state.pagingAmount);
+    } else {
+      pagingIndex = 1;
+    }
+
+    let finalResultOrdered = this.reOrdering(
+      this.state.resultOrder,
+      finalResult,
+      arr
+    );
+
     this.setState({
-      searchResults: finalResult,
+      searchResults: finalResultOrdered,
       searchConditions: searchConditions,
       setStatus: setStatus,
       articlesAcquired: aquiredresult,
       // mediaAcquired: JSON.parse(JSON.stringify(this.state.mediaBrand)),
+      fullPaging: pagingIndex,
+      currentPaging: 1,
     });
   }
 
@@ -436,6 +468,174 @@ class App extends React.Component {
     this.runConditionFiltering(articlesAcquiredStatus);
   }
 
+  /*Adjust Result Component*/
+  changeResultOrder(e) {
+    let newResultOrder;
+    if (e.target.id === 'orderSearchCondition') {
+      if (this.state.resultOrder === 'orderSearchCondition') {
+        return;
+      } else {
+        newResultOrder = 'orderSearchCondition';
+      }
+    } else {
+      if (
+        this.state.resultOrder === 'orderSearchCondition' ||
+        this.state.resultOrder === 'arrowUp'
+      ) {
+        newResultOrder = 'arrowDown';
+      } else if (this.state.resultOrder === 'arrowDown') {
+        newResultOrder = 'arrowUp';
+      }
+    }
+
+    let searchResultsOrdered = this.reOrdering(
+      newResultOrder,
+      this.state.searchResults
+    );
+
+    this.setState({
+      resultOrder: newResultOrder,
+      searchResults: searchResultsOrdered,
+    });
+  }
+
+  reOrdering(newResultOrder, preOrdered, arr) {
+    let postOrdered = [];
+    let searchConditions;
+    if (arr) {
+      searchConditions = arr;
+    } else {
+      searchConditions = this.state.searchConditions;
+    }
+
+    if (newResultOrder === 'orderSearchCondition') {
+      for (let n = 0; n < searchConditions.length; n += 1) {
+        let searchTypeNumberN = searchConditions[n].searchType;
+        if (
+          searchTypeNumberN !== 'Start Date' &&
+          searchTypeNumberN !== 'End Date'
+        ) {
+          if (searchConditions[n].withOrWithout === true) {
+            for (let o = 0; o < preOrdered.length; o += 1) {
+              if (
+                preOrdered[o][searchTypeNumberN] &&
+                preOrdered[o][searchTypeNumberN]
+                  .toLowerCase()
+                  .includes(searchConditions[n].searchValue.toLowerCase()) ===
+                  true
+              ) {
+                let [move] = preOrdered.splice(o, 1);
+                postOrdered.push(move);
+                o -= 1;
+              }
+            }
+          } else if (searchConditions[n].withOrWithout === false) {
+            for (let o = 0; o < preOrdered.length; o += 1) {
+              if (
+                !preOrdered[o][searchTypeNumberN] ||
+                preOrdered[o][searchTypeNumberN]
+                  .toLowerCase()
+                  .includes(searchConditions[n].searchValue.toLowerCase()) ===
+                  false
+              ) {
+                let [move] = preOrdered.splice(o, 1);
+                postOrdered.push(move);
+                o -= 1;
+              }
+            }
+          }
+        } else {
+          for (let o = 0; o < preOrdered.length; o += 1) {
+            let dateIndex = parseInt(preOrdered[o][searchTypeNumberN]);
+            let dateIndexCondition = parseInt(searchConditions[n].searchValue);
+            if (searchTypeNumberN === 'Start Date') {
+              if (
+                preOrdered[o]['Start Date'] &&
+                dateIndex >= dateIndexCondition
+              ) {
+                let [move] = preOrdered.splice(o, 1);
+                postOrdered.push(move);
+                o -= 1;
+              }
+            } else if (searchTypeNumberN === 'End Date') {
+              if (
+                preOrdered[o]['End Date'] &&
+                dateIndex <= dateIndexCondition
+              ) {
+                let [move] = preOrdered.splice(o, 1);
+                postOrdered.push(move);
+                o -= 1;
+              }
+            }
+          }
+        }
+      }
+    } else if (newResultOrder === 'arrowDown') {
+      for (let s = this.state.endDate; s > this.state.startDate; s -= 1) {
+        for (let o = 0; o < preOrdered.length; o += 1) {
+          if (preOrdered[o]['End Date'] === JSON.stringify(s)) {
+            let [move] = preOrdered.splice(o, 1);
+            postOrdered.push(move);
+            o -= 1;
+          }
+        }
+      }
+    } else if (newResultOrder === 'arrowUp') {
+      for (let s = this.state.startDate; s < this.state.endDate; s += 1) {
+        for (let o = 0; o < preOrdered.length; o += 1) {
+          if (preOrdered[o]['Start Date'] === JSON.stringify(s)) {
+            let [move] = preOrdered.splice(o, 1);
+            postOrdered.push(move);
+            o -= 1;
+          }
+        }
+      }
+    }
+
+    return postOrdered;
+  }
+
+  changeCurrentPaging(e) {
+    this.setState({ currentPaging: parseInt(e.target.innerHTML) });
+  }
+
+  clickPagingArrow(e) {
+    let currentPagingStatus = this.state.currentPaging;
+    let fullpagingStatus = this.state.fullPaging;
+    if (e.target.id === 'mostLeft') {
+      this.setState({ currentPaging: 1 });
+    } else if (e.target.id === 'moreLeft') {
+      this.setState({ currentPaging: currentPagingStatus - 1 });
+    } else if (e.target.id === 'moreRight') {
+      this.setState({ currentPaging: currentPagingStatus + 1 });
+    } else if (e.target.id === 'mostRight') {
+      this.setState({ currentPaging: fullpagingStatus });
+    }
+  }
+
+  changePagingAmount(e) {
+    let pagingIndex;
+    let pagingAmoutIndex;
+    if (e.target.value === 'All') {
+      pagingIndex = 1;
+      pagingAmoutIndex = this.state.searchResults.length;
+    } else {
+      pagingIndex = Math.ceil(this.state.searchResults.length / e.target.value);
+      pagingAmoutIndex = e.target.value;
+    }
+    this.setState({
+      pagingAmount: pagingAmoutIndex,
+      fullPaging: pagingIndex,
+      currentPaging: 1,
+    });
+  }
+
+  changeDetailShowing(e) {
+    if (this.state.detailShowing !== e) {
+      this.setState({ detailShowing: e });
+    }
+  }
+
   /*==============================
   =============Render=============
   ==============================*/
@@ -443,14 +643,15 @@ class App extends React.Component {
   render() {
     console.log(this.state);
     let setComponent = [];
+    let buttonComponent = [];
     let mediaBrandComponent = [];
+    let pagingComponent = [];
     let searchResultComponent = [];
     let searchConditionComponent = [];
     let searchResultAllComponent = [];
     const homePageUrl = 'http://localhost:3000/Personal-Project';
 
     if (this.state.searchResults.length > 0) {
-      console.log('Search Activated!');
       searchClassStatus = {
         searchAll: 'searchAllAfter',
         searchResultGroup: 'searchResultGroupAfter',
@@ -464,8 +665,23 @@ class App extends React.Component {
       };
     }
 
-    //Set Component
     if (this.state.searchConditions.length > 0) {
+      searchClassStatus2 = {
+        searchSubmitButton: 'searchSubmitButtonAfter',
+      };
+    }
+
+    //=====Set Component
+    if (this.state.searchConditions.length < 2) {
+      let setTemplate = (
+        <div
+          className='setComponent'
+          key={'setComponent0'}
+          style={{ display: 'flex' }}
+        ></div>
+      );
+      setComponent.push(setTemplate);
+    } else if (this.state.searchConditions.length > 1) {
       let andElement = '';
       let orElement = '';
       if (this.state.setStatus === true) {
@@ -512,7 +728,47 @@ class App extends React.Component {
       setComponent.push(setTemplate);
     }
 
-    //Media Brand Component
+    //=====Button Component
+    if (
+      this.state.searchConditions.length > 0 &&
+      this.state.searchClicked === false
+    ) {
+      buttonComponent = (
+        <div className='searchGroupSecondLine'>
+          <button
+            className='addNewSearchButton'
+            onClick={() => {
+              this.clickAddNewSearchButton();
+            }}
+          >
+            Add New Search Condition
+          </button>
+          <button
+            className={
+              'searchSubmitButton ' + searchClassStatus2.searchSubmitButton
+            }
+            onClick={this.clickSearchSubmitButton}
+          >
+            Search Submit
+          </button>
+        </div>
+      );
+    } else {
+      buttonComponent = (
+        <div className='searchGroupSecondLine'>
+          <button
+            className='addNewSearchButton'
+            onClick={() => {
+              this.clickAddNewSearchButton();
+            }}
+          >
+            Add New Search Condition
+          </button>
+        </div>
+      );
+    }
+
+    //=====Media Brand Component
     for (let k = 0; k < this.state.mediaBrand.length; k += 1) {
       let mediaBrandTemplate = (
         <div
@@ -536,21 +792,242 @@ class App extends React.Component {
       mediaBrandComponent.push(mediaBrandTemplate);
     }
 
-    //Search Result Component
+    //=====Paging Component
+    let currentPagingStatus = this.state.currentPaging;
+    let fullpagingStatus = this.state.fullPaging;
+    let pagingAmountStatus = this.state.pagingAmount;
+    let pagingElements = [];
+    let currentPagingElement = '';
+    let mostLeft = <div className='resultPagingOption'></div>;
+    let moreLeft = <div className='resultPagingOption'></div>;
+    let moreRight = <div className='resultPagingOption'></div>;
+    let mostRight = <div className='resultPagingOption'></div>;
+
+    if (currentPagingStatus > 3 && fullpagingStatus > 5) {
+      mostLeft = (
+        <div
+          className='resultPagingOption pagingArrows'
+          onClick={(e) => {
+            this.clickPagingArrow(e);
+          }}
+          id='mostLeft'
+        >
+          {'<<'}
+        </div>
+      );
+    }
+
+    if (currentPagingStatus > 1) {
+      moreLeft = (
+        <div
+          className='resultPagingOption pagingArrows'
+          onClick={(e) => {
+            this.clickPagingArrow(e);
+          }}
+          id='moreLeft'
+        >
+          {'<'}
+        </div>
+      );
+    }
+
+    if (currentPagingStatus !== fullpagingStatus) {
+      moreRight = (
+        <div
+          className='resultPagingOption pagingArrows'
+          onClick={(e) => {
+            this.clickPagingArrow(e);
+          }}
+          id='moreRight'
+        >
+          {'>'}
+        </div>
+      );
+    }
+
+    if (fullpagingStatus - currentPagingStatus > 2 && fullpagingStatus > 5) {
+      mostRight = (
+        <div
+          className='resultPagingOption pagingArrows'
+          onClick={(e) => {
+            this.clickPagingArrow(e);
+          }}
+          id='mostRight'
+        >
+          {'>>'}
+        </div>
+      );
+    }
+
+    if (fullpagingStatus < 6 || currentPagingStatus < 4) {
+      for (let r = 0; r < 5 && r < fullpagingStatus; r += 1) {
+        if (r + 1 === currentPagingStatus) {
+          currentPagingElement = 'currentPagingElement';
+        } else {
+          currentPagingElement = '';
+        }
+        let pagingElement = (
+          <div
+            className={'pagingElement ' + currentPagingElement}
+            onClick={(e) => {
+              this.changeCurrentPaging(e);
+            }}
+          >
+            {r + 1}
+          </div>
+        );
+        pagingElements.push(pagingElement);
+      }
+    } else if (
+      fullpagingStatus > 5 &&
+      fullpagingStatus - currentPagingStatus > 1
+    ) {
+      for (
+        let r = currentPagingStatus - 2;
+        r < currentPagingStatus + 3;
+        r += 1
+      ) {
+        if (r === currentPagingStatus) {
+          currentPagingElement = 'currentPagingElement';
+        } else {
+          currentPagingElement = '';
+        }
+        let pagingElement = (
+          <div
+            className={'pagingElement ' + currentPagingElement}
+            onClick={(e) => {
+              this.changeCurrentPaging(e);
+            }}
+          >
+            {r}
+          </div>
+        );
+        pagingElements.push(pagingElement);
+      }
+    } else if (
+      fullpagingStatus > 5 &&
+      fullpagingStatus - currentPagingStatus === 1
+    ) {
+      for (
+        let r = currentPagingStatus - 3;
+        r < currentPagingStatus + 2;
+        r += 1
+      ) {
+        if (r === currentPagingStatus) {
+          currentPagingElement = 'currentPagingElement';
+        } else {
+          currentPagingElement = '';
+        }
+        let pagingElement = (
+          <div
+            className={'pagingElement ' + currentPagingElement}
+            onClick={(e) => {
+              this.changeCurrentPaging(e);
+            }}
+          >
+            {r}
+          </div>
+        );
+        pagingElements.push(pagingElement);
+      }
+    } else if (
+      fullpagingStatus > 5 &&
+      fullpagingStatus - currentPagingStatus === 0
+    ) {
+      for (
+        let r = currentPagingStatus - 4;
+        r < currentPagingStatus + 1;
+        r += 1
+      ) {
+        if (r === currentPagingStatus) {
+          currentPagingElement = 'currentPagingElement';
+        } else {
+          currentPagingElement = '';
+        }
+        let pagingElement = (
+          <div
+            className={'pagingElement ' + currentPagingElement}
+            onClick={(e) => {
+              this.changeCurrentPaging(e);
+            }}
+          >
+            {r}
+          </div>
+        );
+        pagingElements.push(pagingElement);
+      }
+    }
+
+    pagingComponent = (
+      <div className='resultPaging'>
+        <div className='resultPagingOption'></div>
+        {mostLeft}
+        {moreLeft}
+        <div className='pagingElements'>{pagingElements}</div>
+        {moreRight}
+        {mostRight}
+        <div className='resultPagingOption'></div>
+      </div>
+    );
+
+    //=====Search Result Component
     if (this.state.searchResults.length === 0) {
       let searchResultTemplate = (
         <div className='noSearchResult'>Currently No Search Result!</div>
       );
       searchResultComponent.push(searchResultTemplate);
-    } else {
-      for (let p = 0; p < this.state.searchResults.length; p += 1) {
+    } else if (this.state.detailShowing === false) {
+      for (
+        let p = 0 + (currentPagingStatus - 1) * pagingAmountStatus;
+        p < currentPagingStatus * pagingAmountStatus &&
+        p < this.state.searchResults.length;
+        p += 1
+      ) {
+        console.log(p + 1);
+        let searchResultTemplate = (
+          <div
+            className={
+              'searchResultComponent ' +
+              searchClassStatus.searchResultComponentClass
+            }
+            id={'searchResultComponent' + p}
+            key={'searchResultComponent' + p}
+          >
+            <a
+              href={this.state.searchResults[p].URL}
+              target='_blank'
+              rel='noreferrer'
+            >
+              <div className='searchResultHeadline'>
+                ◆ {this.state.searchResults[p].Headline}
+              </div>
+              <div className='searchResultSource'>
+                {this.state.searchResults[p].Source}
+              </div>
+            </a>
+          </div>
+        );
+        searchResultComponent.push(searchResultTemplate);
+      }
+    } else if (this.state.detailShowing === true) {
+      for (
+        let p = 0 + (currentPagingStatus - 1) * pagingAmountStatus;
+        p < currentPagingStatus * pagingAmountStatus &&
+        p < this.state.searchResults.length;
+        p += 1
+      ) {
+        console.log(p + 1);
         //Author Processing
         let authorProcessed = '';
-        if (this.state.searchResults[p].Author) {
-          authorProcessed = `
-      Author: ${this.state.searchResults[p].Author.replace('[', '')
-        .replace(']', '')
-        .replaceAll(',', ', ')}`;
+        if (
+          this.state.searchResults[p].Author &&
+          this.state.searchResults[p].Author !== ''
+        ) {
+          authorProcessed = `Author: ${this.state.searchResults[
+            p
+          ].Author.replace('[', '')
+            .replace(']', '')
+            .replaceAll(',', ', ')}`;
         }
 
         //Search Result Template
@@ -606,7 +1083,7 @@ class App extends React.Component {
       }
     }
 
-    //Search Condition Component
+    //=====Search Condition Component
     if (
       this.state.searchConditions.length === 0 &&
       this.state.searchClicked === false
@@ -736,7 +1213,6 @@ class App extends React.Component {
           );
           searchConditionComponent.push(searchConditionTemplate);
         } else if (this.state.searchConditions[i].editing === true) {
-          console.log(this.state.searchConditions[i]);
           let searchConditionEditingTemplate = (
             <div
               className='searchConditionComponent'
@@ -804,7 +1280,7 @@ class App extends React.Component {
       }
     }
 
-    //Overall Search Conditions
+    //=====Search Result All Component
     if (this.state.searchClicked === false) {
       searchResultAllComponent = (
         <div
@@ -812,6 +1288,22 @@ class App extends React.Component {
         ></div>
       );
     } else if (this.state.searchClicked === true) {
+      let resultOrderStaus = this.state.resultOrder;
+      let orderSearchCondition,
+        orderDate,
+        arrowUp,
+        arrowDown = '';
+      if (resultOrderStaus === 'orderSearchCondition') {
+        orderSearchCondition = 'currentResultOrderOption';
+      } else {
+        orderDate = 'currentResultOrderOption';
+        if (resultOrderStaus === 'arrowUp') {
+          arrowUp = 'currentArrowUp';
+        } else if (resultOrderStaus === 'arrowDown') {
+          arrowDown = 'currentArrowDown';
+        }
+      }
+
       searchResultAllComponent = (
         <div
           className={'searchResultGroup ' + searchClassStatus.searchResultGroup}
@@ -819,21 +1311,61 @@ class App extends React.Component {
           <div className='searchResultCatalogue'>
             <div className='resultOrder'>
               <div className='resultOrderTitle'>Order By:</div>
-              <div className='resultOrderOption'>Date</div>
-              <div className='resultOrderOption'>Search Condition</div>
+              <div
+                className={'resultOrderOption ' + orderSearchCondition}
+                onClick={(e) => {
+                  this.changeResultOrder(e);
+                }}
+                id='orderSearchCondition'
+              >
+                Search Condition
+              </div>
+              <div
+                className={'resultOrderOption ' + orderDate}
+                onClick={(e) => {
+                  this.changeResultOrder(e);
+                }}
+                id='orderDate'
+              >
+                Date
+                <div className='orderingArrow'>
+                  <div className={'arrowUp ' + arrowUp}></div>
+                  <div className={'arrowDown ' + arrowDown}></div>
+                </div>
+              </div>
             </div>
-            <div className='resultPaging'>
-              <div className='resultPagingOption'></div>
-              <div className='resultPagingOption'>1</div>
-              <div className='resultPagingOption'>2</div>
-              <div className='resultPagingOption'>3</div>
-              <div className='resultPagingOption'>4</div>
-              <div className='resultPagingOption'>5</div>
-              <div className='resultPagingOption'></div>
+
+            {pagingComponent}
+
+            <div className='pagingAmount'>
+              <div className='pagingAmountTitle'>Results/page: </div>
+              <select
+                className='pagingAmountSelect'
+                onChange={this.changePagingAmount}
+              >
+                <option>10</option>
+                <option>25</option>
+                <option>50</option>
+                <option>All</option>
+              </select>
             </div>
             <div className='resultDisplay'>
-              <img className='resultDisplayComponent' src={block} alt=''></img>
-              <img className='resultDisplayComponent' src={line} alt=''></img>
+              <img
+                className='resultDisplayComponent'
+                src={block}
+                onClick={() => {
+                  this.changeDetailShowing(true);
+                }}
+                alt=''
+              ></img>
+              <img
+                className='resultDisplayComponent'
+                src={line}
+                onClick={() => {
+                  this.changeDetailShowing(false);
+                }}
+                alt=''
+              ></img>
             </div>
           </div>
           {searchResultComponent}
@@ -880,7 +1412,7 @@ class App extends React.Component {
           }}
         >
           <main>
-            <img className='background' src={background}></img>
+            <img className='background' src={background} alt=''></img>
             <div className={'mainLeft ' + searchClassStatus.mainLeft}>
               <div className={'searchAll ' + searchClassStatus.searchAll}>
                 <Droppable droppableId='droppableId'>
@@ -919,23 +1451,8 @@ class App extends React.Component {
                       <option>End Date</option>
                     </select>
                   </div>
-                  <div className='searchGroupSecondLine'>
-                    <button
-                      className='addNewSearchButton'
-                      onClick={() => {
-                        this.clickAddNewSearchButton();
-                      }}
-                    >
-                      Add New Search Condition
-                    </button>
-                    <button
-                      className='searchSubmitButton'
-                      onClick={this.clickSearchSubmitButton}
-                    >
-                      Search Submit
-                    </button>
-                  </div>
 
+                  {buttonComponent}
                   <div className='searchGroupThirdLine'>
                     {mediaBrandComponent}
                   </div>
