@@ -6,12 +6,20 @@ import logo from './img/Logo.png';
 import block from './img/Block.png';
 import line from './img/Line.png';
 import background from './img/Background_Earth.jpg';
+import loadingGif from './img/Loading.gif';
+import question from './img/Question.svg';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { Droppable } from 'react-beautiful-dnd';
 import { Draggable } from 'react-beautiful-dnd';
 
 let searchClassStatus = {};
 let searchClassStatus2 = {};
+let explanation =
+  'To select "And" or "Or" will allow you to choose whether to render the "Intersection" or the "Union" of search results, given inputted search conditions.';
+let setExplanation =
+  'To select "And" or "Or" will allow you to choose whether to render the "Intersection" or the "Union" of search results, given inputted search conditions.';
+let withExplanation =
+  'To select "Include" or "Exclude" will allow you to choose whether to search articles "Include" or "Exclude" the inputted string.';
 
 class App extends React.Component {
   constructor(props) {
@@ -23,6 +31,7 @@ class App extends React.Component {
     this.clickAddNewSearchButton = this.clickAddNewSearchButton.bind(this);
     //Submit Search Conditions
     this.clickSearchSubmitButton = this.clickSearchSubmitButton.bind(this);
+    this.dataDownloading = this.dataDownloading.bind(this);
     this.runConditionFiltering = this.runConditionFiltering.bind(this);
     this.checkConditionFiltering = this.checkConditionFiltering.bind(this);
     //Edit Search Condiiton
@@ -44,30 +53,31 @@ class App extends React.Component {
     this.clickPagingArrow = this.clickPagingArrow.bind(this);
     this.changePagingAmount = this.changePagingAmount.bind(this);
     this.changeDetailShowing = this.changeDetailShowing.bind(this);
+    //Others
+    this.alertClick = this.alertClick.bind(this);
     //State
     this.state = {
       setStatus: true,
       mediaBrand: [
         { brandName: 'The New York Times', checked: true, newsAcquired: [] },
         { brandName: 'The Economist', checked: true, newsAcquired: [] },
-        { brandName: 'Financial Times', checked: false, newsAcquired: [] },
+        { brandName: 'Time Magazine', checked: true, newsAcquired: [] },
       ],
       searchConditions: [
         // {
-        //   withOrWithout: true,
-        //   searchValue: 'Trump',
-        //   searchType: 'Headline',
-        //   editing: false,
-        //   searchValueEditing: 'Trump',
-        //   searchTypeEditing: 'Headline',
-        //   resultAmount: 0,
+        // withOrWithout: true,
+        // searchValue: 'Trump',
+        // searchType: 'Headline',
+        // editing: false,
+        // searchValueEditing: 'Trump',
+        // searchTypeEditing: 'Headline',
+        // resultAmount: 0,
         // },
       ],
       newSearchType: 'Headline',
       newSearchValue: '',
       newSearchPlaceHolder: 'Please Input Your Keyword!',
       articlesAcquired: [],
-      // mediaAcquired: [],
       searchResults: [],
       currentPaging: 1,
       fullPaging: 1,
@@ -77,7 +87,81 @@ class App extends React.Component {
       resultOrder: 'orderSearchCondition',
       startDate: 20200101,
       endDate: 20201231,
+      loading: false,
+      alert: '',
     };
+  }
+
+  //Router
+  componentDidMount() {
+    if (window.location.search === '') {
+    } else {
+      this.setState({ loading: true });
+      let paramsString = window.location.search.substr(1);
+      let paramsObject = JSON.parse(
+        '{"' +
+          decodeURI(paramsString)
+            .replace(/"/g, '\\"')
+            .replace(/&/g, '","')
+            .replace(/=/g, '":"') +
+          '"}'
+      );
+      let paramsKeys = Object.keys(paramsObject);
+      let paramsSearchConditions = [];
+      let paramsSet;
+      let optionary = {
+        H: 'Headline',
+        S: 'Subheadline',
+        A: 'Author',
+        T: 'Text',
+      };
+
+      for (let u = 0; u < paramsKeys.length; u += 1) {
+        let paramsWithOrWithout = true;
+        let paramsSearchValue, paramsSearchType;
+
+        if (paramsKeys[u] === 'SS') {
+          paramsSet = paramsObject['SS'] === 'false' ? false : true;
+          paramsKeys.splice(u, 1);
+          u -= 1;
+        } else {
+          if (paramsKeys[u].slice(0, 2) === 'SC') {
+            if (paramsObject[paramsKeys[u]][0] === 'F') {
+              paramsWithOrWithout = false;
+            }
+
+            if (paramsObject[paramsKeys[u]].slice(0, 2) === 'SD') {
+              paramsSearchValue = paramsObject[paramsKeys[u]].slice(2);
+              paramsSearchType = 'Start Date';
+            } else if (paramsObject[paramsKeys[u]].slice(0, 2) === 'ED') {
+              paramsSearchValue = paramsObject[paramsKeys[u]].slice(2);
+              paramsSearchType = 'End Date';
+            } else {
+              paramsSearchValue = paramsObject[paramsKeys[u]].slice(2);
+              paramsSearchType = optionary[paramsObject[paramsKeys[u]][1]];
+            }
+
+            let paramsSearchCondition = {
+              withOrWithout: paramsWithOrWithout,
+              searchValue: paramsSearchValue,
+              searchType: paramsSearchType,
+              editing: false,
+              searchValueEditing: paramsSearchValue,
+              searchTypeEditing: paramsSearchType,
+              resultAmount: 0,
+            };
+            paramsSearchConditions.push(paramsSearchCondition);
+          }
+        }
+      }
+      this.setState({
+        setStatus: paramsSet,
+        searchConditions: paramsSearchConditions,
+        searchClicked: true,
+      });
+
+      this.dataDownloading(paramsSearchConditions, paramsSet);
+    }
   }
 
   /*==============================
@@ -109,13 +193,20 @@ class App extends React.Component {
 
   clickAddNewSearchButton() {
     if (this.state.newSearchValue === '') {
-      alert('Not yet input anything!');
+      this.setState({ alert: "Haven't input anything yet!" });
     } else {
       if (
         this.state.newSearchType === 'Start Date' ||
         this.state.newSearchType === 'End Date'
       ) {
-        alert('Date Detector Required'); //Unfinished
+        if (
+          isNaN(parseInt(this.state.newSearchValue)) ||
+          parseInt(this.state.newSearchValue) < 10000000 ||
+          parseInt(this.state.newSearchValue) > 99999999
+        ) {
+          this.setState({ alert: 'Please input a valid 8-digit number!' }); //Unfinished
+          return;
+        }
       }
       let newSearchCondition = {
         withOrWithout: true,
@@ -137,45 +228,46 @@ class App extends React.Component {
 
   /*Submit Search Conditions*/
   clickSearchSubmitButton() {
-    if (this.state.searchClicked === true) {
-      return;
+    // if (this.state.searchClicked === true) {
+    //   return;
+    // } else if (this.state.searchConditions.length === 0) {
+    //   this.setState({ alert: 'Please input at least one search condition!' });
+    // } else {
+    this.setState({ loading: true });
+    this.dataDownloading(this.state.searchConditions);
+    // }
+  }
+
+  dataDownloading(arr, set) {
+    let promiseElement = [];
+    let aquiredResult = [];
+    let mediaBrandStatus = JSON.parse(JSON.stringify(this.state.mediaBrand));
+    let getData = (sent) => {
+      return firestore.collection(sent).get();
+    };
+
+    for (let m = 0; m < mediaBrandStatus.length; m += 1) {
+      promiseElement.push(getData(mediaBrandStatus[m].brandName));
     }
-
-    if (this.state.searchConditions.length === 0) {
-      alert('Please input at least one search condition!');
-    } else {
-      let promiseElement = [];
-      let aquiredResult = [];
-      let mediaBrandStatus = JSON.parse(JSON.stringify(this.state.mediaBrand));
-      let getData = (sent) => {
-        return firestore.collection(sent).get();
-      };
-
-      for (let m = 0; m < mediaBrandStatus.length; m += 1) {
-        // if (this.state.mediaBrand[m].checked === true) {
-        promiseElement.push(getData(mediaBrandStatus[m].brandName));
-        // }
-      }
-      Promise.all(promiseElement).then((Response) => {
-        Response.forEach((response) => {
-          response.forEach((res) => {
-            for (let m = 0; m < mediaBrandStatus.length; m += 1) {
-              if (mediaBrandStatus[m].brandName === res.data().Source) {
-                mediaBrandStatus[m].newsAcquired.push(res.data());
-                if (mediaBrandStatus[m].checked === true) {
-                  aquiredResult.push(res.data());
-                }
+    Promise.all(promiseElement).then((Response) => {
+      Response.forEach((response) => {
+        response.forEach((res) => {
+          for (let m = 0; m < mediaBrandStatus.length; m += 1) {
+            if (mediaBrandStatus[m].brandName === res.data().Source) {
+              mediaBrandStatus[m].newsAcquired.push(res.data());
+              if (mediaBrandStatus[m].checked === true) {
+                aquiredResult.push(res.data());
               }
             }
-          });
+          }
         });
-        this.setState({
-          mediaBrand: mediaBrandStatus,
-          searchClicked: true,
-        });
-        this.runConditionFiltering(aquiredResult);
       });
-    }
+      this.setState({
+        mediaBrand: mediaBrandStatus,
+        searchClicked: true,
+      });
+      this.runConditionFiltering(aquiredResult, arr, set);
+    });
   }
 
   runConditionFiltering(aquiredresult, arr, set) {
@@ -360,6 +452,7 @@ class App extends React.Component {
       arr
     );
 
+    // loadingImgClass = 'loadingOff';
     this.setState({
       searchResults: finalResultOrdered,
       searchConditions: searchConditions,
@@ -368,6 +461,7 @@ class App extends React.Component {
       // mediaAcquired: JSON.parse(JSON.stringify(this.state.mediaBrand)),
       fullPaging: pagingIndex,
       currentPaging: 1,
+      loading: false,
     });
   }
 
@@ -396,6 +490,11 @@ class App extends React.Component {
     let deleteIndex = parseInt(e.target.id.slice(21));
     let stateStatus = this.state.searchConditions;
     stateStatus.splice(deleteIndex, 1);
+    if (stateStatus.length === 0) {
+      console.log('123');
+      window.history.replaceState(null, null, '/');
+      // window.location.href =  window.location.href.split("?")[0]
+    }
     this.checkConditionFiltering(stateStatus);
   }
 
@@ -416,14 +515,18 @@ class App extends React.Component {
   saveSearchCondition(e) {
     let saveIndex = parseInt(e.target.id.slice(19));
     let stateStatus = this.state.searchConditions;
-    stateStatus[saveIndex].searchValue = this.state.searchConditions[
-      saveIndex
-    ].searchValueEditing;
-    stateStatus[saveIndex].searchType = this.state.searchConditions[
-      saveIndex
-    ].searchTypeEditing;
-    stateStatus[saveIndex].editing = false;
-    this.checkConditionFiltering(stateStatus);
+    if (this.state.searchConditions[saveIndex].searchValueEditing === '') {
+      this.setState({ alert: "Haven't input anything yet!" });
+    } else {
+      stateStatus[saveIndex].searchValue = this.state.searchConditions[
+        saveIndex
+      ].searchValueEditing;
+      stateStatus[saveIndex].searchType = this.state.searchConditions[
+        saveIndex
+      ].searchTypeEditing;
+      stateStatus[saveIndex].editing = false;
+      this.checkConditionFiltering(stateStatus);
+    }
   }
 
   cancelEditingCondition(e) {
@@ -440,7 +543,6 @@ class App extends React.Component {
   /*Check Media Brand*/
   checkMediaBrand(e) {
     let mediaBrandStatus = this.state.mediaBrand;
-    // let mediaAcquiredStatus = this.state.mediaAcquired;
     let articlesAcquiredStatus = JSON.parse(
       JSON.stringify(this.state.articlesAcquired)
     );
@@ -636,12 +738,53 @@ class App extends React.Component {
     }
   }
 
+  /*Others*/
+  alertClick() {
+    this.setState({ alert: '' });
+  }
+
   /*==============================
   =============Render=============
   ==============================*/
 
   render() {
     console.log(this.state);
+
+    /*=====Router Params=====*/
+    if (this.state.searchConditions.length > 0) {
+      let routerParams = new URLSearchParams({});
+
+      //Set
+      if (this.state.setStatus === true) {
+        routerParams.append('SS', true);
+      } else {
+        routerParams.append('SS', false);
+      }
+
+      //Search Condition
+      for (let t = 0; t < this.state.searchConditions.length; t += 1) {
+        let singleSC = '';
+        if (this.state.searchConditions[t].searchType === 'Start Date') {
+          singleSC = 'SD' + this.state.searchConditions[t].searchValue;
+        } else if (this.state.searchConditions[t].searchType === 'End Date') {
+          singleSC = 'ED' + this.state.searchConditions[t].searchValue;
+        } else if (this.state.searchConditions[t].withOrWithout === true) {
+          singleSC =
+            'T' +
+            this.state.searchConditions[t].searchType.substr(0, 1) +
+            this.state.searchConditions[t].searchValue;
+        } else if (this.state.searchConditions[t].withOrWithout === false) {
+          singleSC =
+            'F' +
+            this.state.searchConditions[t].searchType.substr(0, 1) +
+            this.state.searchConditions[t].searchValue;
+        }
+        routerParams.append('SC' + t, singleSC);
+      }
+
+      window.history.replaceState(null, null, '?' + routerParams.toString());
+    }
+
     let setComponent = [];
     let buttonComponent = [];
     let mediaBrandComponent = [];
@@ -651,7 +794,7 @@ class App extends React.Component {
     let searchResultAllComponent = [];
     const homePageUrl = 'http://localhost:3000/Personal-Project';
 
-    if (this.state.searchResults.length > 0) {
+    if (this.state.searchClicked === true) {
       searchClassStatus = {
         searchAll: 'searchAllAfter',
         searchResultGroup: 'searchResultGroupAfter',
@@ -662,70 +805,108 @@ class App extends React.Component {
         mainLeft: 'mainLeftAfter',
         mainRight: 'mainRightAfter',
         searchResultComponentClass: 'searchResultComponentAfter',
+        addNewSearchButton: 'addNewSearchButtonAfter',
       };
     }
 
-    if (this.state.searchConditions.length > 0) {
-      searchClassStatus2 = {
-        searchSubmitButton: 'searchSubmitButtonAfter',
-      };
-    }
+    let loadingImgClass =
+      this.state.loading === true ? 'loadingOn' : 'loadingOff';
+    let alertObjectClass = this.state.alert !== '' ? 'alertOn' : 'alertOff';
 
     //=====Set Component
-    if (this.state.searchConditions.length < 2) {
-      let setTemplate = (
-        <div
-          className='setComponent'
-          key={'setComponent0'}
-          style={{ display: 'flex' }}
-        ></div>
+    let andElement = '';
+    let orElement = '';
+    if (this.state.setStatus === true) {
+      andElement = 'andElement';
+      orElement = '';
+    } else if (this.state.setStatus === false) {
+      andElement = '';
+      orElement = 'orElement';
+    }
+
+    if (
+      this.state.searchConditions.length === 1 &&
+      this.state.searchClicked === false
+    ) {
+      setComponent = (
+        <div className='setComponent' key={'setComponent0'}>
+          {/* <div className='set1f'>
+            <div className='empty1f'></div>
+            <div className={'setElement setElement1f and1f'}>And</div>
+            <div className={'setElement setElement1f or1f'}>Or</div>
+          </div> */}
+          <div className={'conditionsTitle'}>Search Conditions</div>
+        </div>
       );
-      setComponent.push(setTemplate);
-    } else if (this.state.searchConditions.length > 1) {
-      let andElement = '';
-      let orElement = '';
-      if (this.state.setStatus === true) {
-        andElement = 'andElement';
-        orElement = '';
-      } else if (this.state.setStatus === false) {
-        andElement = '';
-        orElement = 'orElement';
-      }
-      let setTemplate = (
+    } else if (
+      this.state.searchConditions.length > 1 &&
+      this.state.searchClicked === false
+    ) {
+      setComponent = (
+        <div className='setComponent' key={'setComponent0'}>
+          <div className='set1f'>
+            <div className='empty1f'></div>
+            <div
+              className={'setElement and1f ' + andElement}
+              onClick={this.changeSet}
+            >
+              And <div className='setExplanation'>{setExplanation}</div>
+            </div>
+
+            <div
+              className={'setElement or1f ' + orElement}
+              onClick={this.changeSet}
+            >
+              Or <div className='setExplanation'>{setExplanation}</div>
+            </div>
+          </div>
+          <div className={'conditionsTitle'}>Search Conditions</div>
+        </div>
+      );
+    } else if (
+      this.state.searchConditions.length === 1 &&
+      this.state.searchClicked === true
+    ) {
+      setComponent = (
+        <div className='setComponent' key={'setComponent0'}>
+          <div style={{ flex: 4 }}></div>
+          <div className={'matchTitle ' + searchClassStatus.matchTitle}>
+            Accumulative <br></br> Matches
+          </div>
+        </div>
+      );
+    } else if (
+      this.state.searchConditions.length > 1 &&
+      this.state.searchClicked === true
+    ) {
+      setComponent = (
         <div
           className='setComponent'
           key={'setComponent0'}
           style={{ display: 'flex' }}
         >
-          <div style={{ flex: 4.9 }}></div>
+          <div style={{ flex: 4 }}></div>
           <div
             className={'setElement ' + andElement}
-            onClick={() => {
-              this.changeSet();
-            }}
+            onClick={this.changeSet}
             style={{ flex: 1 }}
           >
-            And
+            And <div className='setExplanation'>{setExplanation} </div>
           </div>
+
           <div
             className={'setElement ' + orElement}
-            onClick={() => {
-              this.changeSet();
-            }}
+            onClick={this.changeSet}
             style={{ flex: 1 }}
           >
-            Or
+            Or <div className='setExplanation'>{setExplanation}</div>
           </div>
-          <div style={{ flex: 3.1 }}></div>
-          <div
-            className={'matchTitle ' + searchClassStatus.matchTitle}
-            style={{ flex: 3 }}
-          >
-            Amount of Matches <br></br>(accumulative)
+          <div style={{ flex: 4 }}></div>
+          <div className={'matchTitle ' + searchClassStatus.matchTitle}>
+            Accumulative <br></br> Matches
           </div>
         </div>
       );
-      setComponent.push(setTemplate);
     }
 
     //=====Button Component
@@ -736,7 +917,9 @@ class App extends React.Component {
       buttonComponent = (
         <div className='searchGroupSecondLine'>
           <button
-            className='addNewSearchButton'
+            className={
+              'addNewSearchButton ' + searchClassStatus.addNewSearchButton
+            }
             onClick={() => {
               this.clickAddNewSearchButton();
             }}
@@ -757,7 +940,9 @@ class App extends React.Component {
       buttonComponent = (
         <div className='searchGroupSecondLine'>
           <button
-            className='addNewSearchButton'
+            className={
+              'addNewSearchButton ' + searchClassStatus.addNewSearchButton
+            }
             onClick={() => {
               this.clickAddNewSearchButton();
             }}
@@ -831,7 +1016,7 @@ class App extends React.Component {
       );
     }
 
-    if (currentPagingStatus !== fullpagingStatus) {
+    if (currentPagingStatus !== fullpagingStatus && fullpagingStatus !== 0) {
       moreRight = (
         <div
           className='resultPagingOption pagingArrows'
@@ -972,11 +1157,11 @@ class App extends React.Component {
 
     //=====Search Result Component
     if (this.state.searchResults.length === 0) {
-      let searchResultTemplate = (
+      searchResultComponent = (
         <div className='noSearchResult'>Currently No Search Result!</div>
       );
-      searchResultComponent.push(searchResultTemplate);
     } else if (this.state.detailShowing === false) {
+      let searchResultLineComponent = [];
       for (
         let p = 0 + (currentPagingStatus - 1) * pagingAmountStatus;
         p < currentPagingStatus * pagingAmountStatus &&
@@ -984,31 +1169,42 @@ class App extends React.Component {
         p += 1
       ) {
         console.log(p + 1);
-        let searchResultTemplate = (
-          <div
-            className={
-              'searchResultComponent ' +
-              searchClassStatus.searchResultComponentClass
-            }
-            id={'searchResultComponent' + p}
-            key={'searchResultComponent' + p}
+        let searchResultLineTemplate = (
+          <a
+            href={this.state.searchResults[p].URL}
+            target='_blank'
+            rel='noreferrer'
           >
-            <a
-              href={this.state.searchResults[p].URL}
-              target='_blank'
-              rel='noreferrer'
-            >
-              <div className='searchResultHeadline'>
-                ◆ {this.state.searchResults[p].Headline}
+            <div className='searchResultLineElement'>
+              <div className='searchResultLineSymble'>◆ </div>
+              <div className='searchResultLinetHeadline'>
+                {this.state.searchResults[p].Headline}
               </div>
-              <div className='searchResultSource'>
-                {this.state.searchResults[p].Source}
+              <div className='searchResultLinetThirdColumn'>
+                <div className='searchResultLineSource'>
+                  {this.state.searchResults[p].Source}
+                </div>
+                <div className='searchResultLineDate'>
+                  Date: {this.state.searchResults[p]['Start Date']}
+                </div>
               </div>
-            </a>
-          </div>
+            </div>
+          </a>
         );
-        searchResultComponent.push(searchResultTemplate);
+        searchResultLineComponent.push(searchResultLineTemplate);
       }
+      searchResultComponent = (
+        <div
+          className={
+            'searchResultLineComponent ' +
+            searchClassStatus.searchResultComponentClass
+          }
+          id={'searchResultLineComponent'}
+          key={'searchResultComponent'}
+        >
+          {searchResultLineComponent}
+        </div>
+      );
     } else if (this.state.detailShowing === true) {
       for (
         let p = 0 + (currentPagingStatus - 1) * pagingAmountStatus;
@@ -1017,9 +1213,25 @@ class App extends React.Component {
         p += 1
       ) {
         console.log(p + 1);
+
+        //Subheadline Processing
+        let subheadlineProcessed = 'Subheadline: N/A';
+        if (
+          this.state.searchResults[p].Subheadline &&
+          this.state.searchResults[p].Subheadline !== ''
+        ) {
+          subheadlineProcessed =
+            'Subheadline: ' + this.state.searchResults[p].Subheadline;
+        }
+
         //Author Processing
         let authorProcessed = '';
         if (
+          !this.state.searchResults[p].Author ||
+          this.state.searchResults[p].Author === ''
+        ) {
+          authorProcessed = 'Author: N/A';
+        } else if (
           this.state.searchResults[p].Author &&
           this.state.searchResults[p].Author !== ''
         ) {
@@ -1032,52 +1244,49 @@ class App extends React.Component {
 
         //Search Result Template
         let searchResultTemplate = (
-          <div
-            className={
-              'searchResultComponent ' +
-              searchClassStatus.searchResultComponentClass
-            }
-            id={'searchResultComponent' + p}
-            key={'searchResultComponent' + p}
+          <a
+            href={this.state.searchResults[p].URL}
+            target='_blank'
+            rel='noreferrer'
           >
-            <a
-              href={this.state.searchResults[p].URL}
-              target='_blank'
-              rel='noreferrer'
+            <div
+              className={
+                'searchResultComponent ' +
+                searchClassStatus.searchResultComponentClass
+              }
+              id={'searchResultComponent' + p}
+              key={'searchResultComponent' + p}
             >
-              <img
-                className='searchResultImg'
-                src={
-                  require('./img/' +
-                    this.state.searchResults[p].Source +
-                    '.png').default
-                }
-                alt=''
-              ></img>
-
-              <div className='searchResultFirstLine'>
-                <div className='searchResultSubheadline'>
-                  {this.state.searchResults[p].Subheadline}
-                </div>
-                <div className='searchResultDate'>
-                  Date: {this.state.searchResults[p]['Start Date']}
-                </div>
+              <div className='searchResultLeft'>
+                <img
+                  className='searchResultImg'
+                  src={
+                    require('./img/' +
+                      this.state.searchResults[p].Source +
+                      '.png').default
+                  }
+                  alt=''
+                ></img>
               </div>
-
-              <div className='searchResultSecondLine'>
+              <div className='searchResultRight'>
                 <div className='searchResultHeadline'>
                   {this.state.searchResults[p].Headline}
                 </div>
-                <div className='searchResultAuthor'>{authorProcessed}</div>
-              </div>
-
-              <div className='searchResultThirdLine'>
+                <div className='searchResultSubheadline'>
+                  {subheadlineProcessed}
+                </div>
+                <div className='searchResultThirdLine'>
+                  <div className='searchResultAuthor'>{authorProcessed}</div>
+                  <div className='searchResultDate'>
+                    Date: {this.state.searchResults[p]['Start Date']}
+                  </div>
+                </div>
                 <div className='searchResultParagraph'>
                   {this.state.searchResults[p]['Lead Paragraph']}
                 </div>
               </div>
-            </a>
-          </div>
+            </div>
+          </a>
         );
         searchResultComponent.push(searchResultTemplate);
       }
@@ -1130,9 +1339,13 @@ class App extends React.Component {
               key={'withOrWithoutComponent' + i}
               onClick={this.withOrWithoutYou}
             >
-              <div className={'withOrWithoutElement ' + withElement}>With</div>
+              <div className={'withOrWithoutElement ' + withElement}>
+                Include
+                <div class='withExplanation'>{withExplanation}</div>
+              </div>
               <div className={'withOrWithoutElement ' + withoutElement}>
-                Without
+                Exclude
+                <div class='withExplanation'>{withExplanation}</div>
               </div>
             </div>
           );
@@ -1233,6 +1446,16 @@ class App extends React.Component {
                     id={'inputNewSearchKeyword' + i} //21
                     onChange={this.inputNewSearchKeyword}
                     value={this.state.searchConditions[i].searchValueEditing}
+                    // onKeyUp={(e, key) => {
+                    //   if (
+                    //     key === 'Enter' &&
+                    //     this.state.searchConditions[i].searchValueEditing !== ''
+                    //   ) {
+                    //     this.saveSearchCondition(e);
+                    //     console.log(e);
+                    //     console.log(key);
+                    //   }
+                    // }}
                   ></input>
                   <select
                     className='search-right-top searchSelect'
@@ -1310,7 +1533,7 @@ class App extends React.Component {
         >
           <div className='searchResultCatalogue'>
             <div className='resultOrder'>
-              <div className='resultOrderTitle'>Order By:</div>
+              <div className='resultOrderTitle'>Order:</div>
               <div
                 className={'resultOrderOption ' + orderSearchCondition}
                 onClick={(e) => {
@@ -1318,7 +1541,7 @@ class App extends React.Component {
                 }}
                 id='orderSearchCondition'
               >
-                Search Condition
+                Condition
               </div>
               <div
                 className={'resultOrderOption ' + orderDate}
@@ -1386,13 +1609,9 @@ class App extends React.Component {
             <a href={homePageUrl}>
               <div className='headerLink'> Home</div>
             </a>
-            <div className='headerLink'>
-              Data
-              <br />
-              Visualization
-            </div>
-            <div className='headerLink'>Membership</div>
-            <div className='headerLink'>Contact Us</div>
+            <a href='mailto:tj920419@gmail.com'>
+              <div className='headerLink'>Contact Us</div>
+            </a>
           </div>
         </header>
         <DragDropContext
@@ -1467,6 +1686,25 @@ class App extends React.Component {
         <footer>
           <div className='footerText'>© 2020. All rights reserved.</div>
         </footer>
+        <div class={loadingImgClass}>
+          <img src={loadingGif} className='loadingGif' alt='' />
+        </div>
+        <div class={alertObjectClass}>
+          <div class='alertGroup'>
+            <div class='alertFirstLine'>
+              <div class='alertText'>{this.state.alert}</div>
+            </div>
+            <div class='alertSecondLine'>
+              <button class='alertButton' onClick={this.alertClick}>
+                Ok
+              </button>
+            </div>
+          </div>
+        </div>
+        {/* <div class='question'>
+          <img class='questionImg' src={question} alt=''></img>
+          <div className='explanation'>{explanation}</div>
+        </div> */}
       </div>
     );
   }
