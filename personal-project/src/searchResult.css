@@ -61,7 +61,7 @@
 }
 
 .currentResultOrderOption {
-  cursor: inherit;
+  cursor: default;
   text-decoration: underline;
 }
 
@@ -73,6 +73,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  margin-left: 2px;
 }
 
 .arrowUp {
@@ -131,7 +132,7 @@
 }
 
 .currentPagingElement {
-  cursor: inherit;
+  cursor: default;
   font-weight: bold;
   text-decoration: underline;
 }
@@ -163,6 +164,12 @@
   width: 30px;
   margin-right: 10px;
 }
+.resultDisplayComponent:hover {
+  box-shadow: 0px 0px 3px 3px rgba(0, 0, 0, 0.25);
+}
+.currentDetailShowing {
+  outline: 1px dashed white;
+}
 
 .noSearchResult {
   color: white;
@@ -179,7 +186,7 @@
     width: 0;
   }
   to {
-    width: 700px;
+    width: 680px;
   }
 }
 
@@ -197,6 +204,10 @@
   animation-duration: 2s;
   overflow: hidden;
   padding: 10px;
+}
+.searchResultComponent:hover {
+  box-shadow: 5px 5px 5px 5px rgba(0, 0, 0, 0.25);
+  transition: all 0.2s ease-in-out;
 }
 
 .searchResultLeft {
@@ -278,15 +289,23 @@
   margin: 3px 0px;
   align-items: center;
 }
-
+.searchResultLineElement:hover .searchResultLinetHeadline {
+  font-weight: bold;
+  text-decoration: underline;
+  transition: all 0.2s ease-in-out;
+}
+.searchResultLineElement:hover .searchResultLinetThirdColumn {
+  font-weight: bold;
+  text-decoration: underline;
+  transition: all 0.2s ease-in-out;
+}
 .searchResultLineSymble {
   flex: 0.3;
   line-height: 20px;
   text-align: middle;
 }
-
 .searchResultLinetHeadline {
-  flex: 7.5;
+  flex: 7.2;
   line-height: 20px;
   margin-right: 20px;
 }

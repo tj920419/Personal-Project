@@ -7,15 +7,15 @@ import block from './img/Block.png';
 import line from './img/Line.png';
 import background from './img/Background_Earth.jpg';
 import loadingGif from './img/Loading.gif';
-import question from './img/Question.svg';
+// import question from './img/Question.svg';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { Droppable } from 'react-beautiful-dnd';
 import { Draggable } from 'react-beautiful-dnd';
 
 let searchClassStatus = {};
 let searchClassStatus2 = {};
-let explanation =
-  'To select "And" or "Or" will allow you to choose whether to render the "Intersection" or the "Union" of search results, given inputted search conditions.';
+// let explanation =
+//   'To select "And" or "Or" will allow you to choose whether to render the "Intersection" or the "Union" of search results, given inputted search conditions.';
 let setExplanation =
   'To select "And" or "Or" will allow you to choose whether to render the "Intersection" or the "Union" of search results, given inputted search conditions.';
 let withExplanation =
@@ -108,20 +108,34 @@ class App extends React.Component {
       );
       let paramsKeys = Object.keys(paramsObject);
       let paramsSearchConditions = [];
-      let paramsSet;
+      let paramsSet, paramsDetailShowing, paramsResultOrder, paramsPaging;
       let optionary = {
         H: 'Headline',
         S: 'Subheadline',
         A: 'Author',
         T: 'Text',
+        OSC: 'orderSearchCondition',
+        AU: 'arrowUP',
+        AD: 'arrowDown',
       };
 
       for (let u = 0; u < paramsKeys.length; u += 1) {
         let paramsWithOrWithout = true;
         let paramsSearchValue, paramsSearchType;
-
         if (paramsKeys[u] === 'SS') {
-          paramsSet = paramsObject['SS'] === 'false' ? false : true;
+          paramsSet = paramsObject['SS'] === 'true' ? true : false;
+          paramsKeys.splice(u, 1);
+          u -= 1;
+        } else if (paramsKeys[u] === 'DS') {
+          paramsDetailShowing = paramsObject['DS'] === 'true' ? true : false;
+          paramsKeys.splice(u, 1);
+          u -= 1;
+        } else if (paramsKeys[u] === 'RO') {
+          paramsResultOrder = optionary[paramsObject['RO']];
+          paramsKeys.splice(u, 1);
+          u -= 1;
+        } else if (paramsKeys[u] === 'PG') {
+          paramsPaging = paramsObject['PG'];
           paramsKeys.splice(u, 1);
           u -= 1;
         } else {
@@ -129,7 +143,6 @@ class App extends React.Component {
             if (paramsObject[paramsKeys[u]][0] === 'F') {
               paramsWithOrWithout = false;
             }
-
             if (paramsObject[paramsKeys[u]].slice(0, 2) === 'SD') {
               paramsSearchValue = paramsObject[paramsKeys[u]].slice(2);
               paramsSearchType = 'Start Date';
@@ -154,8 +167,13 @@ class App extends React.Component {
           }
         }
       }
+      console.log(parseInt(paramsPaging));
+      console.log(paramsPaging);
       this.setState({
         setStatus: paramsSet,
+        detailShowing: paramsDetailShowing,
+        resultOrder: paramsResultOrder,
+        currentPaging: parseInt(paramsPaging),
         searchConditions: paramsSearchConditions,
         searchClicked: true,
       });
@@ -460,7 +478,7 @@ class App extends React.Component {
       articlesAcquired: aquiredresult,
       // mediaAcquired: JSON.parse(JSON.stringify(this.state.mediaBrand)),
       fullPaging: pagingIndex,
-      currentPaging: 1,
+      // currentPaging: 1,
       loading: false,
     });
   }
@@ -513,7 +531,12 @@ class App extends React.Component {
   }
 
   saveSearchCondition(e) {
-    let saveIndex = parseInt(e.target.id.slice(19));
+    let saveIndex;
+    if (e.key === 'Enter') {
+      saveIndex = parseInt(e.target.id.slice(21));
+    } else {
+      saveIndex = parseInt(e.target.id.slice(19));
+    }
     let stateStatus = this.state.searchConditions;
     if (this.state.searchConditions[saveIndex].searchValueEditing === '') {
       this.setState({ alert: "Haven't input anything yet!" });
@@ -761,6 +784,25 @@ class App extends React.Component {
         routerParams.append('SS', false);
       }
 
+      //Result Order
+      if (this.state.resultOrder === 'orderSearchCondition') {
+        routerParams.append('RO', 'OSC');
+      } else if (this.state.resultOrder === 'arrowUp') {
+        routerParams.append('RO', 'AU');
+      } else if (this.state.resultOrder === 'arrowDown') {
+        routerParams.append('RO', 'AD');
+      }
+
+      //CurrentPaging
+      routerParams.append('PG', JSON.stringify(this.state.currentPaging));
+
+      //Detail Showing
+      if (this.state.detailShowing === true) {
+        routerParams.append('DS', true);
+      } else {
+        routerParams.append('DS', false);
+      }
+
       //Search Condition
       for (let t = 0; t < this.state.searchConditions.length; t += 1) {
         let singleSC = '';
@@ -781,7 +823,6 @@ class App extends React.Component {
         }
         routerParams.append('SC' + t, singleSC);
       }
-
       window.history.replaceState(null, null, '?' + routerParams.toString());
     }
 
@@ -792,7 +833,7 @@ class App extends React.Component {
     let searchResultComponent = [];
     let searchConditionComponent = [];
     let searchResultAllComponent = [];
-    const homePageUrl = 'http://localhost:3000/Personal-Project';
+    const homePageUrl = 'https://newsplatform-9a5f4.web.app/';
 
     if (this.state.searchClicked === true) {
       searchClassStatus = {
@@ -857,7 +898,8 @@ class App extends React.Component {
               className={'setElement or1f ' + orElement}
               onClick={this.changeSet}
             >
-              Or <div className='setExplanation'>{setExplanation}</div>
+              Or
+              {/* <div className='setExplanation'>{setExplanation}</div> */}
             </div>
           </div>
           <div className={'conditionsTitle'}>Search Conditions</div>
@@ -871,7 +913,7 @@ class App extends React.Component {
         <div className='setComponent' key={'setComponent0'}>
           <div style={{ flex: 4 }}></div>
           <div className={'matchTitle ' + searchClassStatus.matchTitle}>
-            Accumulative <br></br> Matches
+            Accumulated <br></br> Matches
           </div>
         </div>
       );
@@ -899,7 +941,8 @@ class App extends React.Component {
             onClick={this.changeSet}
             style={{ flex: 1 }}
           >
-            Or <div className='setExplanation'>{setExplanation}</div>
+            Or
+            {/* <div className='setExplanation'>{setExplanation}</div> */}
           </div>
           <div style={{ flex: 4 }}></div>
           <div className={'matchTitle ' + searchClassStatus.matchTitle}>
@@ -1299,7 +1342,7 @@ class App extends React.Component {
     ) {
       searchConditionComponent = (
         <div className='noSearchConditions'>
-          Please Inputted Search Condition!
+          Please Input A Search Condition!
         </div>
       );
     } else if (
@@ -1341,7 +1384,7 @@ class App extends React.Component {
             >
               <div className={'withOrWithoutElement ' + withElement}>
                 Include
-                <div class='withExplanation'>{withExplanation}</div>
+                {/* <div class='withExplanation'>{withExplanation}</div> */}
               </div>
               <div className={'withOrWithoutElement ' + withoutElement}>
                 Exclude
@@ -1446,16 +1489,11 @@ class App extends React.Component {
                     id={'inputNewSearchKeyword' + i} //21
                     onChange={this.inputNewSearchKeyword}
                     value={this.state.searchConditions[i].searchValueEditing}
-                    // onKeyUp={(e, key) => {
-                    //   if (
-                    //     key === 'Enter' &&
-                    //     this.state.searchConditions[i].searchValueEditing !== ''
-                    //   ) {
-                    //     this.saveSearchCondition(e);
-                    //     console.log(e);
-                    //     console.log(key);
-                    //   }
-                    // }}
+                    onKeyUp={(e) => {
+                      if (e.key === 'Enter') {
+                        this.saveSearchCondition(e);
+                      }
+                    }}
                   ></input>
                   <select
                     className='search-right-top searchSelect'
@@ -1527,13 +1565,18 @@ class App extends React.Component {
         }
       }
 
+      let detailShowingTrue =
+        this.state.detailShowing === true ? 'currentDetailShowing' : '';
+      let detailShowingFalse =
+        this.state.detailShowing === false ? 'currentDetailShowing' : '';
+
       searchResultAllComponent = (
         <div
           className={'searchResultGroup ' + searchClassStatus.searchResultGroup}
         >
           <div className='searchResultCatalogue'>
             <div className='resultOrder'>
-              <div className='resultOrderTitle'>Order:</div>
+              <div className='resultOrderTitle'>Order By:</div>
               <div
                 className={'resultOrderOption ' + orderSearchCondition}
                 onClick={(e) => {
@@ -1574,7 +1617,7 @@ class App extends React.Component {
             </div>
             <div className='resultDisplay'>
               <img
-                className='resultDisplayComponent'
+                className={'resultDisplayComponent ' + detailShowingTrue}
                 src={block}
                 onClick={() => {
                   this.changeDetailShowing(true);
@@ -1582,7 +1625,7 @@ class App extends React.Component {
                 alt=''
               ></img>
               <img
-                className='resultDisplayComponent'
+                className={'resultDisplayComponent ' + detailShowingFalse}
                 src={line}
                 onClick={() => {
                   this.changeDetailShowing(false);
@@ -1657,6 +1700,11 @@ class App extends React.Component {
                       onChange={this.inputSearchKeyword}
                       placeholder={this.state.newSearchPlaceHolder}
                       value={this.state.newSearchValue}
+                      onKeyUp={(e) => {
+                        if (e.key === 'Enter') {
+                          this.clickAddNewSearchButton();
+                        }
+                      }}
                     ></input>
                     <select
                       className='searchSelect'

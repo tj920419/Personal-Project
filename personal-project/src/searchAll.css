@@ -43,6 +43,17 @@
   display: flex;
   margin: 10px 5.5px 10px;
 }
+.setComponent:hover .setExplanation {
+  background-color: white;
+  position: absolute;
+  display: block;
+  width: 300px;
+  border: 1px solid #000000;
+  border-radius: 3px;
+  z-index: 200;
+  color: #000000;
+  text-align: justify;
+}
 .setElement {
   cursor: pointer;
   border: transparent 1.5px solid;
@@ -59,17 +70,6 @@
 }
 .setExplanation {
   display: none;
-}
-.setElement:hover .setExplanation {
-  background-color: white;
-  position: absolute;
-  display: block;
-  width: 300px;
-  border: 1px solid #000000;
-  border-radius: 3px;
-  z-index: 200;
-  color: #000000;
-  text-align: justify;
 }
 .orElement {
   background-color: #03456e;
@@ -96,7 +96,7 @@
   width: 23.5px;
 }
 .setElement1f {
-  cursor: inherit;
+  cursor: default;
 }
 .and1f {
   width: 48px;
@@ -112,7 +112,7 @@
 }
 
 .setElement1t {
-  cursor: inherit;
+  cursor: default;
 }
 
 /*=====searchConditionGroup*/
@@ -121,11 +121,14 @@
   border-width: 2px;
   margin: 0 auto;
 }
-
 .searchConditionComponent {
   border-top: dashed #000000 1px;
-  margin: 0 5.5px 0px;
+  margin: 0 5.5px 0;
   padding: 15px 0;
+}
+.searchConditionComponent:hover {
+  box-shadow: 5px 5px 5px 5px rgba(0, 0, 0, 0.25);
+  transition: all 0.2s ease-in-out;
 }
 
 .searchConditionLeftColumn {
@@ -135,26 +138,14 @@
   vertical-align: top;
   width: 80px;
 }
-
 .searchConditionLeftColumnAfter {
   width: 54.5px;
   margin: 0 20px;
 }
-
 .withOrWithoutComponent {
   cursor: pointer;
 }
-.withOrWithoutElement {
-  line-height: 18px;
-  border: transparent 1.5px solid;
-  border-radius: 10px;
-  background-color: #d4d3d3;
-  color: white;
-}
-.withExplanation {
-  display: none;
-}
-.withOrWithoutElement:hover .withExplanation {
+.withOrWithoutComponent:hover .withExplanation {
   background-color: white;
   position: absolute;
   display: block;
@@ -165,14 +156,25 @@
   color: #000000;
   text-align: justify;
 }
-
+.withOrWithoutElement {
+  height: 21px;
+  border: transparent 1.5px solid;
+  border-radius: 10px;
+  background-color: #d4d3d3;
+  color: white;
+}
+.withExplanation {
+  display: none;
+}
 .withElement {
   background-color: #007cc7;
   color: white;
+  margin-bottom: 3px;
 }
 .withoutElement {
   background-color: #f95347;
   color: white;
+  margin-top: 3px;
 }
 
 .searchConditionMidColumn {
@@ -180,11 +182,17 @@
   vertical-align: top;
   width: 290px; /*445*/
 }
-
+.search-left-top {
+  margin-bottom: 3px;
+}
+.search-right-top {
+  margin-bottom: 3px;
+}
 .searchConditionValue {
+  line-height: 21px;
+  height: 21px;
   word-break: break-all;
 }
-
 .searchConditionRightColumn {
   display: inline-block;
   margin-left: 30px;
@@ -193,12 +201,10 @@
   text-align: left;
   width: 112.5px;
 }
-
 .searchConditionRightColumnAfter {
   opacity: 1;
   width: 64.5px;
 }
-
 .searchResultAmountComponent {
   font-size: 30px;
   line-height: 42px;
@@ -209,7 +215,7 @@
 .searchGroup {
   border-color: #386691;
   border-width: 2px;
-  margin: 0px auto 5px;
+  margin: 0px auto 12.5px;
 }
 
 .searchGroupFirstLine {
