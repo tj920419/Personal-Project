@@ -34,16 +34,18 @@ body {
 ==============================*/
 header {
   background-color: #040d42;
-  /* background-color: #386691; */
-  /* background-color: #31206c; */
-  /* display: flex; */
-  /* font-family: 'Vacer Serif Regular'; */
-  /* font-family: 'Breve Slab Title'; */
   height: 110px;
   position: fixed;
   top: 0;
   width: 100%;
   z-index: 10;
+
+  -webkit-box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14),
+    0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12),
+    0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  background-color: white;
+  border-bottom: solid #000000 1px;
 }
 
 .logoImg {
@@ -51,7 +53,9 @@ header {
   float: left;
   height: 100%;
   margin-left: 22px;
-  transform: scale(1.2);
+  /* transform: scale(1.2); */
+
+  /* display: none; */
 }
 
 .headerLinkGroup {
@@ -69,6 +73,8 @@ header {
   font-size: 25px;
   margin: 0 50px;
   vertical-align: middle;
+
+  color: #000000;
 }
 
 /*==============================
@@ -82,6 +88,8 @@ main {
   margin-top: 110px;
   width: 100%;
   z-index: 6;
+
+  /* background: linear-gradient(90deg, #e3ffe7 0%, #d9e7ff 100%); */
 }
 
 .background {
@@ -97,6 +105,8 @@ main {
   background-size: cover;
   filter: grayscale(100%);
   z-index: -1;
+
+  /* display: none; */
 }
 
 /*==============================
@@ -105,18 +115,28 @@ main {
 footer {
   background-color: #040d42;
   bottom: 0;
-  height: 55px;
+  height: 45px;
   justify-content: center;
-  position: fixed;
+  /* position: fixed; */
   width: 100%;
   z-index: 10;
+
+  /* display: none; */
+  -webkit-box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14),
+    0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 -4px 5px 0 rgba(0, 0, 0, 0.14),
+    0 -1px 10px 0 rgba(0, 0, 0, 0.12), 0 -2px 4px -1px rgba(0, 0, 0, 0.2);
+  background-color: white;
+  border-top: solid #000000 1px;
 }
 
 .footerText {
   color: white;
   font-style: italic;
-  margin: 10px auto;
+  margin: 0px auto;
   text-align: center;
+
+  color: #000000;
 }
 
 /*=====Loading=====*/
@@ -205,33 +225,3 @@ footer {
   top: calc(70% - 8px);
   left: calc(50% - 52.5px);
 }
-
-/* .question {
-  position: fixed;
-  bottom: 75px;
-  left: 20px;
-  height: 25px;
-  width: 25px;
-}
-.questionImg {
-  cursor: pointer;
-  display: block;
-  height: 25px;
-  width: 25px;
-}
-.explanation {
-  display: none;
-}
-.question:hover .explanation {
-  background-color: white;
-  position: absolute;
-  display: block;
-  top: 290px;
-  left: 315px;
-  width: 150px;
-  border: 1px solid #000000;
-  border-radius: 3px;
-  z-index: 200;
-  color: #000000;
-  text-align: justify;
-} */

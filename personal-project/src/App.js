@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './App.css';
 import { firestore } from './firebase.js';
-import logo from './img/Logo.png';
+import logo from './img/Logo2.0.png';
 import block from './img/Block.png';
 import line from './img/Line.png';
 import background from './img/Background_Earth.jpg';
@@ -17,7 +17,7 @@ let searchClassStatus2 = {};
 // let explanation =
 //   'To select "And" or "Or" will allow you to choose whether to render the "Intersection" or the "Union" of search results, given inputted search conditions.';
 let setExplanation =
-  'To select "And" or "Or" will allow you to choose whether to render the "Intersection" or the "Union" of search results, given inputted search conditions.';
+  'To select "Intersection" or "Union" will allow you to choose whether to render the intersection or the union of search results, given inputted search conditions.';
 let withExplanation =
   'To select "Include" or "Exclude" will allow you to choose whether to search articles "Include" or "Exclude" the inputted string.';
 
@@ -59,8 +59,19 @@ class App extends React.Component {
     this.state = {
       setStatus: true,
       mediaBrand: [
-        { brandName: 'The New York Times', checked: true, newsAcquired: [] },
+        {
+          brandName: 'Bloomberg Businessweek',
+          checked: true,
+          newsAcquired: [],
+        },
+        { brandName: 'Financial Times', checked: true, newsAcquired: [] },
         { brandName: 'The Economist', checked: true, newsAcquired: [] },
+        { brandName: 'The New York Times', checked: true, newsAcquired: [] },
+        {
+          brandName: 'The Wall Street Journal',
+          checked: true,
+          newsAcquired: [],
+        },
         { brandName: 'Time Magazine', checked: true, newsAcquired: [] },
       ],
       searchConditions: [
@@ -95,6 +106,7 @@ class App extends React.Component {
   //Router
   componentDidMount() {
     if (window.location.search === '') {
+      console.log('From Front Page!');
     } else {
       this.setState({ loading: true });
       let paramsString = window.location.search.substr(1);
@@ -134,6 +146,7 @@ class App extends React.Component {
           paramsResultOrder = optionary[paramsObject['RO']];
           paramsKeys.splice(u, 1);
           u -= 1;
+          console.log(paramsResultOrder);
         } else if (paramsKeys[u] === 'PG') {
           paramsPaging = paramsObject['PG'];
           paramsKeys.splice(u, 1);
@@ -463,14 +476,16 @@ class App extends React.Component {
     } else {
       pagingIndex = 1;
     }
+    let newCurrentPaging =
+      this.state.currentPaging > pagingIndex ? 1 : this.state.currentPaging;
 
+    console.log(this.state.resultOrder);
     let finalResultOrdered = this.reOrdering(
       this.state.resultOrder,
       finalResult,
-      arr
+      searchConditions
     );
 
-    // loadingImgClass = 'loadingOff';
     this.setState({
       searchResults: finalResultOrdered,
       searchConditions: searchConditions,
@@ -478,7 +493,7 @@ class App extends React.Component {
       articlesAcquired: aquiredresult,
       // mediaAcquired: JSON.parse(JSON.stringify(this.state.mediaBrand)),
       fullPaging: pagingIndex,
-      // currentPaging: 1,
+      currentPaging: newCurrentPaging,
       loading: false,
     });
   }
@@ -613,10 +628,14 @@ class App extends React.Component {
       }
     }
 
+    console.log(this.state.searchResults);
+
     let searchResultsOrdered = this.reOrdering(
       newResultOrder,
       this.state.searchResults
     );
+
+    console.log(searchResultsOrdered);
 
     this.setState({
       resultOrder: newResultOrder,
@@ -716,7 +735,6 @@ class App extends React.Component {
         }
       }
     }
-
     return postOrdered;
   }
 
@@ -871,11 +889,6 @@ class App extends React.Component {
     ) {
       setComponent = (
         <div className='setComponent' key={'setComponent0'}>
-          {/* <div className='set1f'>
-            <div className='empty1f'></div>
-            <div className={'setElement setElement1f and1f'}>And</div>
-            <div className={'setElement setElement1f or1f'}>Or</div>
-          </div> */}
           <div className={'conditionsTitle'}>Search Conditions</div>
         </div>
       );
@@ -885,24 +898,29 @@ class App extends React.Component {
     ) {
       setComponent = (
         <div className='setComponent' key={'setComponent0'}>
-          <div className='set1f'>
-            <div className='empty1f'></div>
-            <div
-              className={'setElement and1f ' + andElement}
-              onClick={this.changeSet}
-            >
-              And <div className='setExplanation'>{setExplanation}</div>
-            </div>
+          <div className='setElements set1f'>
+            <div>
+              <div
+                className={'setElement and1f ' + andElement}
+                onClick={this.changeSet}
+              >
+                Intersection{' '}
+              </div>
 
-            <div
-              className={'setElement or1f ' + orElement}
-              onClick={this.changeSet}
-            >
-              Or
-              {/* <div className='setExplanation'>{setExplanation}</div> */}
+              <div
+                className={'setElement or1f ' + orElement}
+                onClick={this.changeSet}
+              >
+                Union
+              </div>
+              <div className='setExplanation setExplanation1f '>
+                {setExplanation}
+              </div>
             </div>
           </div>
-          <div className={'conditionsTitle'}>Search Conditions</div>
+          <div className={'conditionsTitle conditionsTitle2f'}>
+            Search Conditions
+          </div>
         </div>
       );
     } else if (
@@ -911,7 +929,9 @@ class App extends React.Component {
     ) {
       setComponent = (
         <div className='setComponent' key={'setComponent0'}>
-          <div style={{ flex: 4 }}></div>
+          <div className={'conditionsTitle conditionsTitle1t'}>
+            Search Conditions
+          </div>
           <div className={'matchTitle ' + searchClassStatus.matchTitle}>
             Accumulated <br></br> Matches
           </div>
@@ -927,26 +947,23 @@ class App extends React.Component {
           key={'setComponent0'}
           style={{ display: 'flex' }}
         >
-          <div style={{ flex: 4 }}></div>
-          <div
-            className={'setElement ' + andElement}
-            onClick={this.changeSet}
-            style={{ flex: 1 }}
-          >
-            And <div className='setExplanation'>{setExplanation} </div>
+          <div className='setElements'>
+            <div
+              className={'setElement ' + andElement}
+              onClick={this.changeSet}
+            >
+              Intersection
+            </div>
+            <div className={'setElement ' + orElement} onClick={this.changeSet}>
+              Union
+            </div>
+            <div className='setExplanation'>{setExplanation} </div>
           </div>
-
-          <div
-            className={'setElement ' + orElement}
-            onClick={this.changeSet}
-            style={{ flex: 1 }}
-          >
-            Or
-            {/* <div className='setExplanation'>{setExplanation}</div> */}
+          <div className={'conditionsTitle conditionsTitle2t'}>
+            Search Conditions
           </div>
-          <div style={{ flex: 4 }}></div>
           <div className={'matchTitle ' + searchClassStatus.matchTitle}>
-            Accumulative <br></br> Matches
+            Accumulated <br></br> Matches
           </div>
         </div>
       );

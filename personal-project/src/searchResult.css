@@ -28,6 +28,14 @@
   background-color: #9e9e9e;
   border: #03456e solid 10px;
   width: 800px;
+
+  background-color: #ffffff;
+  border: 1px solid #000000;
+  border-radius: 8px;
+  -webkit-box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14),
+    0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12),
+    0 2px 4px -1px rgba(0, 0, 0, 0.2);
 }
 
 /*=====searchResultCatalogue*/
@@ -84,8 +92,9 @@
   height: 40%;
   margin-bottom: 15%;
   width: 0;
-}
 
+  border-bottom: 8px solid #d4d3d3;
+}
 .currentArrowUp {
   border-bottom: 8px solid #000000;
 }
@@ -98,8 +107,9 @@
   height: 40%;
   margin-top: 15%;
   width: 0;
-}
 
+  border-top: 8px solid #d4d3d3;
+}
 .currentArrowDown {
   border-top: 8px solid #000000;
 }
@@ -169,6 +179,8 @@
 }
 .currentDetailShowing {
   outline: 1px dashed white;
+
+  outline: 1px dashed #000000;
 }
 
 .noSearchResult {
@@ -178,6 +190,8 @@
   line-height: 150px;
   text-align: center;
   width: 780px;
+
+  color: #000000;
 }
 
 /*=====searchResultComponent*/
@@ -204,6 +218,14 @@
   animation-duration: 2s;
   overflow: hidden;
   padding: 10px;
+
+  background-color: #ffffff;
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  -webkit-box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14),
+    0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12),
+    0 2px 4px -1px rgba(0, 0, 0, 0.2);
 }
 .searchResultComponent:hover {
   box-shadow: 5px 5px 5px 5px rgba(0, 0, 0, 0.25);
@@ -264,6 +286,8 @@
   overflow-y: auto;
   border-top: #5f89a3 4px double;
   padding-top: 2px;
+
+  border-top: #767676 4px double;
 }
 
 /*=====Line Component=====*/
@@ -281,6 +305,14 @@
   animation-duration: 2s;
   overflow: hidden;
   padding: 7.5px 15px;
+
+  background-color: #ffffff;
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  -webkit-box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14),
+    0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12),
+    0 2px 4px -1px rgba(0, 0, 0, 0.2);
 }
 
 .searchResultLineElement {
@@ -327,9 +359,18 @@
 
 @media (min-width: 1681px) {
   .mainRightAfter {
-    width: 53%;
+    width: 54%;
+  }
+}
+
+@media (min-width: 1441px) and (max-width: 1680px) {
+  .mainRightAfter {
+    width: 56%;
   }
 }
 
 @media (min-width: 1281px) and (max-width: 1440px) {
+  .mainRightAfter {
+    width: 50%;
+  }
 }

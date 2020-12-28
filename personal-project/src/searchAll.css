@@ -25,11 +25,24 @@
   width: 600px;
   transition: all 0.75s 2.5s;
   z-index: 7;
-}
 
+  border: 1px solid #000000;
+  border-radius: 8px;
+  -webkit-box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14),
+    0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12),
+    0 2px 4px -1px rgba(0, 0, 0, 0.2);
+}
 .searchAllAfter {
   margin: 150px auto 0;
   width: 500px;
+}
+
+.searchAllTop {
+  /*new*/
+  border-bottom: 1px #000000 solid;
+  margin: 0 5.5px 3px;
+  padding-bottom: 5px;
 }
 
 .noSearchConditions {
@@ -39,11 +52,29 @@
 }
 
 /*=====setGroup*/
+@keyframes setButton {
+  from {
+    /* font-size: 12px; */
+    opacity: 0;
+    /* width: 0; */
+  }
+  to {
+    /* font-size: 13.33px; */
+    opacity: 1;
+    /* width: 105px; */
+  }
+}
+
 .setComponent {
   display: flex;
-  margin: 10px 5.5px 10px;
+  margin: 20px 0px 15px;
 }
-.setComponent:hover .setExplanation {
+.setElements {
+  display: inline-block;
+  width: 98.5px;
+  animation: setButton 2s;
+}
+.setElements:hover .setExplanation {
   background-color: white;
   position: absolute;
   display: block;
@@ -53,20 +84,29 @@
   z-index: 200;
   color: #000000;
   text-align: justify;
+  margin-left: 11.25px;
 }
 .setElement {
   cursor: pointer;
-  border: transparent 1.5px solid;
   border-radius: 15px;
   line-height: 22px;
   margin: 5px 1px;
   transition: background-color 0.5s, color 0.5s;
   background-color: #d4d3d3;
   color: white;
+  width: 72px;
+
+  line-height: 21px;
+  height: 21px;
+  margin: 0 auto;
+  vertical-align: middle;
 }
 .andElement {
   background-color: #03456e;
   color: white;
+
+  background-color: #767676;
+  margin-bottom: 3px;
 }
 .setExplanation {
   display: none;
@@ -74,6 +114,9 @@
 .orElement {
   background-color: #03456e;
   color: white;
+
+  background-color: #767676;
+  margin-top: 3px;
 }
 
 .matchTitle {
@@ -81,7 +124,7 @@
   text-align: left;
   opacity: 0;
   transition: opacity 0.75s 2.5s;
-  width: 94.5px;
+  width: 98.5px;
 }
 .matchTitleAfter {
   opacity: 1;
@@ -89,28 +132,42 @@
 
 /*length = 1*/
 .set1f {
-  flex: 2.662;
-  display: flex;
-}
-.empty1f {
-  width: 23.5px;
+  width: 148.5px;
+  display: inline-block;
+  animation: setButton 2s;
 }
 .setElement1f {
   cursor: default;
 }
 .and1f {
-  width: 48px;
+  width: 100.5px;
 }
 .or1f {
-  width: 48px;
+  width: 100.5px;
+}
+.set1f:hover .setExplanation1f {
+  margin-left: 23px;
 }
 .conditionsTitle {
-  flex: 7.3381;
   font-size: 24px;
   font-weight: bold;
-  line-height: 35px;
-}
+  line-height: 45px;
 
+  width: 438.5px;
+  margin-left: 148.5px;
+  /* transition: margin-left 2s 0s, width 2s 0s; */
+}
+.conditionsTitle2f {
+  margin-left: 0;
+}
+.conditionsTitle1t {
+  margin-left: 98.5px;
+  width: 290px;
+}
+.conditionsTitle2t {
+  margin-left: 0;
+  width: 290px;
+}
 .setElement1t {
   cursor: default;
 }
@@ -123,7 +180,7 @@
 }
 .searchConditionComponent {
   border-top: dashed #000000 1px;
-  margin: 0 5.5px 0;
+  /* margin: 0 5.5px 0; */
   padding: 15px 0;
 }
 .searchConditionComponent:hover {
@@ -133,14 +190,14 @@
 
 .searchConditionLeftColumn {
   display: inline-block;
-  margin: 0 33px;
+  margin: 0 34px;
   transition: all 0.75s 2.5s;
   vertical-align: top;
-  width: 80px;
+  width: 80.5px;
 }
 .searchConditionLeftColumnAfter {
   width: 54.5px;
-  margin: 0 20px;
+  margin: 0 22px;
 }
 .withOrWithoutComponent {
   cursor: pointer;
@@ -158,7 +215,7 @@
 }
 .withOrWithoutElement {
   height: 21px;
-  border: transparent 1.5px solid;
+  line-height: 21px;
   border-radius: 10px;
   background-color: #d4d3d3;
   color: white;
@@ -170,11 +227,15 @@
   background-color: #007cc7;
   color: white;
   margin-bottom: 3px;
+
+  background-color: #767676;
 }
 .withoutElement {
   background-color: #f95347;
   color: white;
   margin-top: 3px;
+
+  background-color: #767676;
 }
 
 .searchConditionMidColumn {
@@ -183,27 +244,64 @@
   width: 290px; /*445*/
 }
 .search-left-top {
+  float: left;
+  font-size: 16px;
+  line-height: 21px;
   margin-bottom: 3px;
+  margin-right: 5px;
+  width: 180px;
 }
 .search-right-top {
+  float: left;
+  font-size: 16px;
+  height: 21px;
   margin-bottom: 3px;
+  width: 105px;
 }
 .searchConditionValue {
   line-height: 21px;
   height: 21px;
   word-break: break-all;
 }
+.search-left-bottom {
+  cursor: pointer;
+  float: left;
+  height: 21px;
+  width: 180px;
+  margin-right: 5px;
+  background-color: #007cc7;
+  color: white;
+  border-radius: 5px;
+  border-style: none;
+
+  background-color: #2c91ce;
+  font-size: 14px;
+}
+.search-right-bottom {
+  cursor: pointer;
+  float: left;
+  height: 21px;
+  width: 105px;
+  background-color: #f95347;
+  color: #ffffff;
+  border-radius: 5px;
+  border-style: none;
+
+  background-color: #fd6e63;
+  font-size: 14px;
+}
+
 .searchConditionRightColumn {
   display: inline-block;
   margin-left: 30px;
   opacity: 0;
   transition: all 0.75s 2.5s;
   text-align: left;
-  width: 112.5px;
+  width: 118.5px;
 }
 .searchConditionRightColumnAfter {
   opacity: 1;
-  width: 64.5px;
+  width: 68.5px;
 }
 .searchResultAmountComponent {
   font-size: 30px;
@@ -219,60 +317,21 @@
 }
 
 .searchGroupFirstLine {
-  margin: 0px 5.5px 8px;
-  padding-top: 10px;
+  margin: 0px 5.5px 10px;
+  padding-top: 20px;
   border-top: 4px#f95347 double;
+
+  border-top: 1px#000000 solid;
 }
-
-.search-left-top {
-  float: left;
-  line-height: 21px;
-  width: 180px;
-  margin-right: 5px;
-}
-
-.search-right-top {
-  float: left;
-  height: 21px;
-  width: 105px;
-}
-
-.search-left-bottom {
-  cursor: pointer;
-  float: left;
-  height: 21px;
-  width: 180px;
-  margin-right: 5px;
-
-  background-color: #007cc7;
-  color: white;
-  border-radius: 5px;
-  border-style: none;
-}
-
-.search-right-bottom {
-  cursor: pointer;
-  float: left;
-  height: 21px;
-  width: 105px;
-
-  background-color: #f95347;
-  color: white;
-  border-radius: 5px;
-  border-style: none;
-}
-
 .searchInput {
   height: 21px;
   width: 180px;
   margin-right: 5px;
 }
-
 .searchSelect {
   height: 21px;
   width: 105px;
 }
-
 .addNewSearchButton {
   cursor: pointer;
   height: 21px;
@@ -282,7 +341,6 @@
   border-radius: 5px;
   border-style: none;
 }
-
 .addNewSearchButtonAfter {
   background-color: #03456e;
 }
@@ -299,7 +357,6 @@
     width: 105px;
   }
 }
-
 .searchSubmitButton {
   cursor: pointer;
   height: 21px;
@@ -321,19 +378,16 @@
   display: flex;
   flex-wrap: wrap;
 }
-
 .mediaBrandComponent {
   text-align: left;
-  transition: all 0.75s 2.5s;
-  padding-left: 45px;
-  width: 190px;
+  /* transition: all 0.75s 2.5s; */
+  padding-left: 90px;
+  width: 290px;
 }
-
 .mediaBrandComponentAfter {
-  padding-left: 75px;
-  width: 239.5px;
+  padding-left: 67.5px;
+  width: 247px;
 }
-
 input[type='checkbox'] {
   vertical-align: middle;
   background: #fff;
@@ -355,5 +409,18 @@ input[type='checkbox'] {
   }
 }
 
+@media (min-width: 1441px) and (max-width: 1680px) {
+  .mainLeftAfter {
+    width: 44%;
+    padding-left: 0;
+    /* padding-left: calc(22.5% - 300px); */
+  }
+}
+
 @media (min-width: 1281px) and (max-width: 1440px) {
+  .mainLeftAfter {
+    width: 55%;
+    padding-left: 0;
+    /* padding-left: calc(22.5% - 300px); */
+  }
 }
