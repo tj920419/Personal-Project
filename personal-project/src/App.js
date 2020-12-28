@@ -92,7 +92,7 @@ class App extends React.Component {
       searchResults: [],
       currentPaging: 1,
       fullPaging: 1,
-      pagingAmount: 10,
+      pagingAmount: '10',
       detailShowing: true,
       searchClicked: false,
       resultOrder: 'orderSearchCondition',
@@ -120,7 +120,11 @@ class App extends React.Component {
       );
       let paramsKeys = Object.keys(paramsObject);
       let paramsSearchConditions = [];
-      let paramsSet, paramsDetailShowing, paramsResultOrder, paramsPaging;
+      let paramsSet,
+        paramsDetailShowing,
+        paramsResultOrder,
+        paramsPaging,
+        paramsPagingAmount;
       let optionary = {
         H: 'Headline',
         S: 'Subheadline',
@@ -149,6 +153,10 @@ class App extends React.Component {
           console.log(paramsResultOrder);
         } else if (paramsKeys[u] === 'PG') {
           paramsPaging = paramsObject['PG'];
+          paramsKeys.splice(u, 1);
+          u -= 1;
+        } else if (paramsKeys[u] === 'PA') {
+          paramsPagingAmount = paramsObject['PA'];
           paramsKeys.splice(u, 1);
           u -= 1;
         } else {
@@ -187,6 +195,7 @@ class App extends React.Component {
         detailShowing: paramsDetailShowing,
         resultOrder: paramsResultOrder,
         currentPaging: parseInt(paramsPaging),
+        pagingAmount: paramsPagingAmount,
         searchConditions: paramsSearchConditions,
         searchClicked: true,
       });
@@ -813,6 +822,9 @@ class App extends React.Component {
 
       //CurrentPaging
       routerParams.append('PG', JSON.stringify(this.state.currentPaging));
+
+      //PagingAmount
+      routerParams.append('PA', this.state.pagingAmount);
 
       //Detail Showing
       if (this.state.detailShowing === true) {
@@ -1625,6 +1637,7 @@ class App extends React.Component {
               <select
                 className='pagingAmountSelect'
                 onChange={this.changePagingAmount}
+                value={this.state.pagingAmount}
               >
                 <option>10</option>
                 <option>25</option>
