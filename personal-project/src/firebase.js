@@ -2,7 +2,7 @@ import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
 
-let firebaseConfig = {
+const firebaseConfig = {
   apiKey: 'AIzaSyBwWOLt0ioY91SqVnr1mPh1meUBBanjIYk',
   authDomain: 'newsplatform-9a5f4.firebaseapp.com',
   databaseURL: 'https://newsplatform-9a5f4.firebaseio.com',

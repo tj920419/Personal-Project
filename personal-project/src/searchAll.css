@@ -43,6 +43,11 @@
   border-bottom: 1px #000000 solid;
   margin: 0 5.5px 3px;
   padding-bottom: 5px;
+  width: 587px;
+  transition: width 0.75s 2.5s;
+}
+.searchAllTopAfter {
+  width: 487px;
 }
 
 .noSearchConditions {
@@ -54,14 +59,10 @@
 /*=====setGroup*/
 @keyframes setButton {
   from {
-    /* font-size: 12px; */
     opacity: 0;
-    /* width: 0; */
   }
   to {
-    /* font-size: 13.33px; */
     opacity: 1;
-    /* width: 105px; */
   }
 }
 
@@ -314,6 +315,11 @@
   border-color: #386691;
   border-width: 2px;
   margin: 0px auto 12.5px;
+  width: 598px;
+  transition: width 0.75s 2.5s;
+}
+.searchGroupAfter {
+  width: 498px;
 }
 
 .searchGroupFirstLine {
@@ -322,6 +328,11 @@
   border-top: 4px#f95347 double;
 
   border-top: 1px#000000 solid;
+  width: 587px;
+  transition: width 0.75s 2.5s;
+}
+.searchGroupFirstLineAfter {
+  width: 487px;
 }
 .searchInput {
   height: 21px;
