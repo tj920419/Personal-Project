@@ -35,8 +35,6 @@ class App extends React.Component {
     this.deleteSearchCondition = this.deleteSearchCondition.bind(this);
     this.inputNewSearchKeyword = this.inputNewSearchKeyword.bind(this);
     this.changeNewSearchOption = this.changeNewSearchOption.bind(this);
-    this.editSearchCondition = this.editSearchCondition.bind(this);
-    this.deleteSearchCondition = this.deleteSearchCondition.bind(this);
     this.saveSearchCondition = this.saveSearchCondition.bind(this);
     this.cancelEditingCondition = this.cancelEditingCondition.bind(this);
     //Check Media Brand
@@ -118,17 +116,18 @@ class App extends React.Component {
         A: 'Author',
         T: 'Text',
         OSC: 'orderSearchCondition',
-        AU: 'arrowUP',
+        AU: 'arrowUp',
         AD: 'arrowDown',
       };
 
       for (let u = 0; u < paramsKeys.length; u += 1) {
         if (paramsKeys[u] === 'SS') {
-          paramsSet = paramsObject['SS'] === 'true' ? true : false;
+          paramsSet = paramsObject['SS'] === 'true';
           paramsKeys.splice(u, 1);
           u -= 1;
         } else if (paramsKeys[u] === 'RO') {
           paramsResultOrder = optionary[paramsObject['RO']];
+          console.log(paramsResultOrder);
           paramsKeys.splice(u, 1);
           u -= 1;
         } else if (paramsKeys[u] === 'PG') {
@@ -137,21 +136,16 @@ class App extends React.Component {
           u -= 1;
         } else if (paramsKeys[u] === 'PA') {
           paramsPagingAmount =
-            paramsObject['PA'] === 10 ||
-            paramsObject['PA'] === 25 ||
-            paramsObject['PA'] === 50
-              ? paramsObject['PA']
-              : 'All';
+            paramsObject['PA'] === 'All' ? 'All' : parseInt(paramsObject['PA']);
           paramsKeys.splice(u, 1);
           u -= 1;
         } else if (paramsKeys[u] === 'DS') {
-          paramsDetailShowing = paramsObject['DS'] === 'true' ? true : false;
+          paramsDetailShowing = paramsObject['DS'] === 'true';
           paramsKeys.splice(u, 1);
           u -= 1;
         } else {
           if (paramsKeys[u].slice(0, 2) === 'SC') {
-            paramsWithOrWithout =
-              paramsObject[paramsKeys[u]][0] === 'F' ? false : true;
+            paramsWithOrWithout = paramsObject[paramsKeys[u]][0] !== 'F';
             if (paramsObject[paramsKeys[u]].slice(0, 2) === 'SD') {
               paramsSearchValue = paramsObject[paramsKeys[u]].slice(2);
               paramsSearchType = 'Start Date';
@@ -1412,7 +1406,7 @@ class App extends React.Component {
                       <button
                         className='search-right-bottom searchConditionDelete'
                         id={'searchConditionDelete' + i} //21
-                        onClick={this.deleteSearchCondition}
+                        onClick={() => this.deleteSearchCondition(i)}
                       >
                         Delete
                       </button>
