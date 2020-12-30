@@ -19,36 +19,6 @@ const withExplanation =
 class App extends React.Component {
   constructor(props) {
     super(props);
-    //Set Search Condition
-    this.changeSet = this.changeSet.bind(this);
-    this.inputSearchKeyword = this.inputSearchKeyword.bind(this);
-    this.changeSearchOption = this.changeSearchOption.bind(this);
-    this.clickAddNewSearchButton = this.clickAddNewSearchButton.bind(this);
-    //Submit Search Conditions
-    this.clickSearchSubmitButton = this.clickSearchSubmitButton.bind(this);
-    this.dataDownloading = this.dataDownloading.bind(this);
-    this.runConditionFiltering = this.runConditionFiltering.bind(this);
-    this.checkConditionFiltering = this.checkConditionFiltering.bind(this);
-    //Edit Search Condiiton
-    this.withOrWithoutYou = this.withOrWithoutYou.bind(this);
-    this.editSearchCondition = this.editSearchCondition.bind(this);
-    this.deleteSearchCondition = this.deleteSearchCondition.bind(this);
-    this.inputNewSearchKeyword = this.inputNewSearchKeyword.bind(this);
-    this.changeNewSearchOption = this.changeNewSearchOption.bind(this);
-    this.saveSearchCondition = this.saveSearchCondition.bind(this);
-    this.cancelEditingCondition = this.cancelEditingCondition.bind(this);
-    //Check Media Brand
-    this.checkMediaBrand = this.checkMediaBrand.bind(this);
-    //Adjust Result Component
-    this.changeResultOrder = this.changeResultOrder.bind(this);
-    this.reOrdering = this.reOrdering.bind(this);
-    this.changeCurrentPaging = this.changeCurrentPaging.bind(this);
-    this.clickPagingArrow = this.clickPagingArrow.bind(this);
-    this.changePagingAmount = this.changePagingAmount.bind(this);
-    this.changeDetailShowing = this.changeDetailShowing.bind(this);
-    //Others
-    this.alertClick = this.alertClick.bind(this);
-    //State
     this.state = {
       setStatus: true,
       mediaBrand: [
@@ -188,16 +158,16 @@ class App extends React.Component {
   ============Functions===========
   ==============================*/
   /*Set Search Condition*/
-  changeSet() {
+  changeSet = () => {
     const newSetStatus = !this.state.setStatus;
     this.checkConditionFiltering(undefined, newSetStatus);
-  }
+  };
 
-  inputSearchKeyword(e) {
+  inputSearchKeyword = (e) => {
     this.setState({ newSearchValue: e.target.value });
-  }
+  };
 
-  changeSearchOption(e) {
+  changeSearchOption = (e) => {
     if (e.target.value === 'Start Date' || e.target.value === 'End Date') {
       this.setState({
         newSearchType: e.target.value,
@@ -209,9 +179,9 @@ class App extends React.Component {
         newSearchPlaceHolder: 'Please Input Your Keyword!',
       });
     }
-  }
+  };
 
-  clickAddNewSearchButton() {
+  clickAddNewSearchButton = () => {
     if (this.state.newSearchValue === '') {
       this.setState({ alert: "Haven't input anything yet!" });
     } else {
@@ -245,15 +215,15 @@ class App extends React.Component {
       });
       this.checkConditionFiltering(this.state.searchConditions);
     }
-  }
+  };
 
   /*Submit Search Conditions*/
-  clickSearchSubmitButton() {
+  clickSearchSubmitButton = () => {
     this.setState({ loading: true });
     this.dataDownloading(this.state.searchConditions);
-  }
+  };
 
-  dataDownloading(searchConditions, setStatus) {
+  dataDownloading = (searchConditions, setStatus) => {
     const promiseElement = [];
     const aquiredResult = [];
     const mediaBrandStatus = JSON.parse(JSON.stringify(this.state.mediaBrand));
@@ -298,9 +268,9 @@ class App extends React.Component {
       });
       this.runConditionFiltering(aquiredResult, searchConditions, setStatus);
     });
-  }
+  };
 
-  runConditionFiltering(aquiredresult, searchconditions, setstatus) {
+  runConditionFiltering = (aquiredresult, searchconditions, setstatus) => {
     let finalResult = [];
     let searchTypeNumberN;
     const searchConditions =
@@ -488,88 +458,75 @@ class App extends React.Component {
       currentPaging: newCurrentPaging,
       loading: false,
     });
-  }
+  };
 
-  checkConditionFiltering(searchConditions, setStatus) {
+  checkConditionFiltering = (searchConditions, setStatus) => {
     const aquiredResult = JSON.parse(
       JSON.stringify(this.state.articlesAcquired)
     );
     this.runConditionFiltering(aquiredResult, searchConditions, setStatus);
-  }
+  };
 
   /*Edit Search Condiiton*/
-  withOrWithoutYou(e) {
-    const yourIndex = parseInt(e.currentTarget.id.slice(22));
+  withOrWithoutYou = (index) => {
     const stateStatus = this.state.searchConditions;
-    stateStatus[yourIndex].withOrWithout = !stateStatus[yourIndex]
-      .withOrWithout;
+    stateStatus[index].withOrWithout = !stateStatus[index].withOrWithout;
     this.checkConditionFiltering(stateStatus);
-  }
+  };
 
-  editSearchCondition(e) {
-    const editIndex = parseInt(e.target.id.slice(19));
+  editSearchCondition = (index) => {
     const stateStatus = this.state.searchConditions;
-    stateStatus[editIndex].editing = true;
+    stateStatus[index].editing = true;
     this.setState({ searchConditions: stateStatus });
-  }
+  };
 
-  deleteSearchCondition(e) {
-    const deleteIndex = parseInt(e.target.id.slice(21));
+  deleteSearchCondition = (index) => {
     const stateStatus = this.state.searchConditions;
-    stateStatus.splice(deleteIndex, 1);
+    stateStatus.splice(index, 1);
     if (stateStatus.length === 0) {
       window.history.replaceState(null, null, '/');
     }
     this.checkConditionFiltering(stateStatus);
-  }
+  };
 
-  inputNewSearchKeyword(e) {
-    const inputIndex = parseInt(e.target.id.slice(21));
+  inputNewSearchKeyword = (e, index) => {
     const stateStatus = this.state.searchConditions;
-    stateStatus[inputIndex].searchValueEditing = e.target.value;
+    stateStatus[index].searchValueEditing = e.target.value;
     this.setState({ searchConditions: stateStatus });
-  }
+  };
 
-  changeNewSearchOption(e) {
-    const selectIndex = parseInt(e.target.id.slice(21));
+  changeNewSearchOption = (e, index) => {
     const stateStatus = this.state.searchConditions;
-    stateStatus[selectIndex].searchTypeEditing = e.target.value;
+    stateStatus[index].searchTypeEditing = e.target.value;
     this.setState({ searchConditions: stateStatus });
-  }
+  };
 
-  saveSearchCondition(e) {
-    const saveIndex =
-      e.key === 'Enter'
-        ? parseInt(e.target.id.slice(21))
-        : parseInt(e.target.id.slice(19));
+  saveSearchCondition = (index) => {
     const stateStatus = this.state.searchConditions;
-    if (this.state.searchConditions[saveIndex].searchValueEditing === '') {
+    if (this.state.searchConditions[index].searchValueEditing === '') {
       this.setState({ alert: "Haven't input anything yet!" });
     } else {
-      stateStatus[saveIndex].searchValue = this.state.searchConditions[
-        saveIndex
+      stateStatus[index].searchValue = this.state.searchConditions[
+        index
       ].searchValueEditing;
-      stateStatus[saveIndex].searchType = this.state.searchConditions[
-        saveIndex
+      stateStatus[index].searchType = this.state.searchConditions[
+        index
       ].searchTypeEditing;
-      stateStatus[saveIndex].editing = false;
+      stateStatus[index].editing = false;
       this.checkConditionFiltering(stateStatus);
     }
-  }
+  };
 
-  cancelEditingCondition(e) {
-    const cancelIndex = parseInt(e.target.id.slice(28));
+  cancelEditingCondition = (index) => {
     const stateStatus = this.state.searchConditions;
-    stateStatus[cancelIndex].editing = false;
-    stateStatus[cancelIndex].searchValueEditing =
-      stateStatus[cancelIndex].searchValue;
-    stateStatus[cancelIndex].searchTypeEditing =
-      stateStatus[cancelIndex].searchType;
+    stateStatus[index].editing = false;
+    stateStatus[index].searchValueEditing = stateStatus[index].searchValue;
+    stateStatus[index].searchTypeEditing = stateStatus[index].searchType;
     this.setState({ searchConditions: stateStatus });
-  }
+  };
 
   /*Check Media Brand*/
-  checkMediaBrand(e) {
+  checkMediaBrand = (e) => {
     const mediaBrandStatus = this.state.mediaBrand;
     const articlesAcquiredStatus = JSON.parse(
       JSON.stringify(this.state.articlesAcquired)
@@ -596,10 +553,10 @@ class App extends React.Component {
       mediaBrand: mediaBrandStatus,
     });
     this.runConditionFiltering(articlesAcquiredStatus);
-  }
+  };
 
   /*Adjust Result Component*/
-  changeResultOrder(e) {
+  changeResultOrder = (e) => {
     let newResultOrder;
     if (e.target.id === 'orderSearchCondition') {
       if (this.state.resultOrder === 'orderSearchCondition') {
@@ -627,9 +584,9 @@ class App extends React.Component {
       resultOrder: newResultOrder,
       searchResults: searchResultsOrdered,
     });
-  }
+  };
 
-  reOrdering(newResultOrder, preOrdered, searchconditions) {
+  reOrdering = (newResultOrder, preOrdered, searchconditions) => {
     const postOrdered = [];
     const searchConditions =
       searchconditions !== undefined
@@ -722,13 +679,13 @@ class App extends React.Component {
       }
     }
     return postOrdered;
-  }
+  };
 
-  changeCurrentPaging(e) {
+  changeCurrentPaging = (e) => {
     this.setState({ currentPaging: parseInt(e.target.innerHTML) });
-  }
+  };
 
-  clickPagingArrow(e) {
+  clickPagingArrow = (e) => {
     const currentPagingStatus = this.state.currentPaging;
     const fullpagingStatus = this.state.fullPaging;
     if (e.target.id === 'mostLeft') {
@@ -740,9 +697,9 @@ class App extends React.Component {
     } else if (e.target.id === 'mostRight') {
       this.setState({ currentPaging: fullpagingStatus });
     }
-  }
+  };
 
-  changePagingAmount(e) {
+  changePagingAmount = (e) => {
     let pagingIndex;
     let pagingAmountIndex;
     if (e.target.value === 'All') {
@@ -757,18 +714,18 @@ class App extends React.Component {
       pagingAmount: pagingAmountIndex,
       currentPaging: 1,
     });
-  }
+  };
 
-  changeDetailShowing(e) {
+  changeDetailShowing = (e) => {
     if (this.state.detailShowing !== e) {
       this.setState({ detailShowing: e });
     }
-  }
+  };
 
   /*Others*/
-  alertClick() {
+  alertClick = () => {
     this.setState({ alert: '' });
-  }
+  };
 
   /*==============================
   =============Render=============
@@ -1336,9 +1293,11 @@ class App extends React.Component {
           withOrWithoutTemplate = (
             <div
               className='withOrWithoutComponent'
-              id={'withOrWithoutComponent' + i} //22
+              id={'withOrWithoutComponent' + i}
               key={'withOrWithoutComponent' + i}
-              onClick={this.withOrWithoutYou}
+              onClick={() => {
+                this.withOrWithoutYou(i);
+              }}
             >
               <div className={'withOrWithoutElement ' + withElement}>
                 Include
@@ -1355,7 +1314,7 @@ class App extends React.Component {
         const searchResultAmountTemplate = (
           <div
             className={'searchResultAmountComponent'}
-            id={'searchResultAmountComponent' + i} //27
+            id={'searchResultAmountComponent' + i}
             key={'searchResultAmountComponent' + i}
           >
             {this.state.searchConditions[i].resultAmount}
@@ -1398,14 +1357,16 @@ class App extends React.Component {
                     <div className='searchConditionGroupSecondLine'>
                       <button
                         className='search-left-bottom searchConditionEdit'
-                        id={'searchConditionEdit' + i} //19
-                        onClick={this.editSearchCondition}
+                        id={'searchConditionEdit' + i}
+                        onClick={() => {
+                          this.editSearchCondition(i);
+                        }}
                       >
                         Edit
                       </button>
                       <button
                         className='search-right-bottom searchConditionDelete'
-                        id={'searchConditionDelete' + i} //21
+                        id={'searchConditionDelete' + i}
                         onClick={() => this.deleteSearchCondition(i)}
                       >
                         Delete
@@ -1443,19 +1404,23 @@ class App extends React.Component {
                 <div className='searchConditionGroupFirstLine'>
                   <input
                     className='search-left-top searchInput'
-                    id={'inputNewSearchKeyword' + i} //21
-                    onChange={this.inputNewSearchKeyword}
+                    id={'inputNewSearchKeyword' + i}
+                    onChange={(e) => {
+                      this.inputNewSearchKeyword(e, i);
+                    }}
                     value={this.state.searchConditions[i].searchValueEditing}
                     onKeyUp={(e) => {
                       if (e.key === 'Enter') {
-                        this.saveSearchCondition(e);
+                        this.saveSearchCondition(i);
                       }
                     }}
                   ></input>
                   <select
                     className='search-right-top searchSelect'
-                    id={'changeNewSearchOption' + i} //21
-                    onChange={this.changeNewSearchOption}
+                    id={'changeNewSearchOption' + i}
+                    onChange={(e) => {
+                      this.changeNewSearchOption(e, i);
+                    }}
                     value={this.state.searchConditions[i].searchTypeEditing}
                   >
                     <option>Headline</option>
@@ -1469,17 +1434,19 @@ class App extends React.Component {
                 <div className='searchConditionGroupSecondLine'>
                   <button
                     className='search-left-bottom searchConditionSave'
-                    id={'searchConditionSave' + i} //19
-                    onClick={(e) => {
-                      this.saveSearchCondition(e);
+                    id={'searchConditionSave' + i}
+                    onClick={() => {
+                      this.saveSearchCondition(i);
                     }}
                   >
                     Save
                   </button>
                   <button
                     className='search-right-bottom searchConditionCancelEditing'
-                    id={'searchConditionCancelEditing' + i} //28
-                    onClick={this.cancelEditingCondition}
+                    id={'searchConditionCancelEditing' + i}
+                    onClick={() => {
+                      this.cancelEditingCondition(i);
+                    }}
                   >
                     Cancel
                   </button>
