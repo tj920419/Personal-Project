@@ -32,7 +32,7 @@ class App extends React.Component {
         { brandName: 'The New York Times', checked: true, newsAcquired: [] },
         {
           brandName: 'The Wall Street Journal',
-          checked: true,
+          checked: false,
           newsAcquired: [],
         },
         { brandName: 'Time Magazine', checked: true, newsAcquired: [] },
